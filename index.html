@@ -102,6 +102,8 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ir
 .enrow .qty{justify-self:end}
 .enrow .know{width:26px;height:26px;accent-color:var(--bronze);cursor:pointer}
 .enrow .mats{margin-top:8px}
+.enrow .recmats{margin-top:0;justify-content:flex-end;align-items:center}
+.enrow .recmats .plus,.enrow .recmats .money{padding-bottom:0}
 .rod{font-size:14px;color:var(--ash);font-weight:700}
 .ennote{padding:10px 20px 0;font-size:15px;color:var(--ash)}
 @media (max-width:760px){
@@ -111,6 +113,7 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ir
   .row{grid-template-columns:1fr}
   .op{display:none}
   .item{order:-1;padding-bottom:8px;border-bottom:1px solid var(--iron)}
+  .enrow .recmats{grid-column:1/-1;margin-top:8px;justify-content:flex-start}
 }
 </style>
 
@@ -728,7 +731,7 @@ function renderEnchRec(){
   $("enList2").innerHTML = `<div class="rows">${vis.filter(e => e.s === enSlot).map(e => { const c = enCost(e); EDIT_ROW = `<div class="code"><span class="codelbl">Код:</span> ${e.code}</div>`; return `
     <div class="enrow">
       ${enHead(e)}
-      <div class="mats" style="grid-column:1/-1">${enMats(e)}${c ? `<span class="plus">=</span>${coins(c)}` : ""}</div>
+      <div class="mats recmats">${enMats(e)}${c ? `<span class="plus">=</span>${coins(c)}` : ""}</div>
     </div>`; }).join("")}</div>`;
 }
 function setQtyE(code, v){
