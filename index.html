@@ -54,6 +54,8 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ir
 .slot .wh{display:block;width:100%;height:100%}
 .tabs{max-width:1000px;margin:0 auto 12px;display:flex;gap:8px}
 .tab{flex:1;font-family:var(--display);font-size:20px;padding:10px;background:var(--hide);color:var(--ash);border:1px solid var(--iron);border-radius:6px;cursor:pointer}
+.subtabs .tab{font-size:17px;padding:7px}
+.subtabs{margin-bottom:12px}
 .tab[aria-selected=true]{background:var(--blood-deep);color:#fff4e2;border-color:var(--bronze)}
 .pick{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 14px;background:var(--hide);border:1px solid var(--iron);border-radius:4px}
 .pick.on{border-color:var(--bronze)}
@@ -84,7 +86,25 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ir
 .lines.paid .coin{font-size:18px}.lines.paid .coin svg{width:16px;height:16px}.lines.paid .money{padding-bottom:0;gap:6px}
 .codebox{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:6px}
 .codebox .code{margin-top:0;font-size:30px;overflow-wrap:anywhere}
+.enwrap{display:grid;grid-template-columns:150px minmax(0,1fr);gap:0}
+.side{display:flex;flex-direction:column;gap:6px;padding:14px 0 14px 14px}
+.side button{font-family:var(--display);font-size:18px;text-align:left;padding:10px 12px;background:var(--hide);color:var(--ash);border:1px solid var(--iron);border-radius:6px;cursor:pointer}
+.side button[aria-selected=true]{background:var(--blood-deep);color:#fff4e2;border-color:var(--bronze)}
+.side .cnt{float:right;font-family:var(--body);font-size:14px;opacity:.7}
+.enbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 20px 0}
+.enbar label{font-size:16px;color:var(--ash);cursor:pointer;display:flex;align-items:center;gap:6px}
+.enrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:center;padding:12px 16px;background:var(--hide);border:1px solid var(--iron);border-radius:4px}
+.enrow.off{opacity:.45}
+.enrow.on{border-color:var(--bronze)}
+.enrow .qty{justify-self:end}
+.enrow .know{width:26px;height:26px;accent-color:var(--bronze);cursor:pointer}
+.enrow .mats{margin-top:8px}
+.rod{font-size:14px;color:var(--ash);font-weight:700}
+.ennote{padding:10px 20px 0;font-size:15px;color:var(--ash)}
 @media (max-width:760px){
+  .enwrap{grid-template-columns:1fr}
+  .side{flex-direction:row;flex-wrap:wrap;padding:12px 14px 0}
+  .side button{white-space:nowrap}
   .row{grid-template-columns:1fr}
   .op{display:none}
   .item{order:-1;padding-bottom:8px;border-bottom:1px solid var(--iron)}
@@ -94,6 +114,10 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ir
 <nav class="tabs" role="tablist">
   <button class="tab" id="t-order" role="tab" aria-selected="true" type="button">Замовлення</button>
   <button class="tab" id="t-recipes" role="tab" aria-selected="false" type="button">Рецепти</button>
+</nav>
+<nav class="tabs subtabs" role="tablist" aria-label="Професія">
+  <button class="tab" id="s-ta" role="tab" aria-selected="true" type="button">Tailoring</button>
+  <button class="tab" id="s-en" role="tab" aria-selected="false" type="button">Enchanting</button>
 </nav>
 
 <div class="board" id="v-order">
@@ -119,6 +143,23 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ir
   </header>
   <div class="howto">У темі листа напиши <b>код</b> сумки, можна кілька: <b>TA01 TA03</b>. Більше копій — повтори код: <b>TA01 TA01</b></div>
   <div id="sections"></div>
+</div>
+
+<div class="board" id="v-ord-ench" hidden>
+  <div id="enPick">
+    <div class="howto">Обери енчанти, які тобі потрібні, і натисни <b>Сформувати</b></div>
+    <div class="enwrap"><nav class="side" id="enSide" role="tablist" aria-label="Слот"></nav><div id="enList" style="padding:6px 20px 84px"></div></div>
+    <button class="btn fab" id="enGen" type="button" disabled>Сформувати</button>
+  </div>
+  <div id="enRes" hidden>
+    <div class="res" id="enResBody"></div>
+    <div class="bar"><button class="btn ghost" id="enBack" type="button">Назад</button></div>
+  </div>
+</div>
+
+<div class="board" id="v-rec-ench" hidden>
+  <div class="howto">У темі листа напиши <b>код</b> енчанта, можна кілька: <b>EN01 EN03</b>. Більше разів, повтори код: <b>EN01 EN01</b></div>
+  <div class="enwrap"><nav class="side" id="enSide2" role="tablist" aria-label="Слот"></nav><div id="enList2" style="padding:6px 20px 18px"></div></div>
 </div>
 
 <script>
@@ -156,7 +197,223 @@ const MAT = {
   bLotus:  {id:13468, cap:"Black Lotus",   kind:"herb",   c:"#3a2a4a"},
   morrow:  {id:11040, cap:"Morrowgrain",   kind:"herb",   c:"#d9b84a"},
   blood:   {id:19726, cap:"Bloodvine",     kind:"herb",   c:"#c0242a"},
+  // --- реагенти енчантингу (id з Wowhead; ціни збирає той самий скрипт) ---
+  soulDust: {id:11083, cap:"Soul Dust", kind:"dust", c:"#b9ab90"},
+  largeGlimmeringShard: {id:11084, cap:"Large Glimmering Shard", kind:"dust", c:"#b9ab90"},
+  greaterAstralEssence: {id:11082, cap:"Greater Astral Essence", kind:"dust", c:"#b9ab90"},
+  sulfuricAcid: {id:249410, cap:"Sulfuric Acid", kind:"dust", c:"#b9ab90"},
+  pyrite: {id:249391, cap:"Pyrite", kind:"dust", c:"#b9ab90"},
+  silverOre: {id:2775, cap:"Silver Ore", kind:"dust", c:"#b9ab90"},
+  strangeDust: {id:10940, cap:"Strange Dust", kind:"dust", c:"#b9ab90"},
+  frilledLichen: {id:249399, cap:"Frilled Lichen", kind:"dust", c:"#b9ab90"},
+  largeGlowingShard: {id:11139, cap:"Large Glowing Shard", kind:"dust", c:"#b9ab90"},
+  lesserNetherEssence: {id:11174, cap:"Lesser Nether Essence", kind:"dust", c:"#b9ab90"},
+  illusionDust: {id:16204, cap:"Illusion Dust", kind:"dust", c:"#b9ab90"},
+  essenceOfAir: {id:7082, cap:"Essence of Air", kind:"dust", c:"#b9ab90"},
+  righteousOrb: {id:12811, cap:"Righteous Orb", kind:"dust", c:"#b9ab90"},
+  smallRadiantShard: {id:11177, cap:"Small Radiant Shard", kind:"dust", c:"#b9ab90"},
+  dreamDust: {id:11176, cap:"Dream Dust", kind:"dust", c:"#b9ab90"},
+  potionOfDemonSlaying: {id:9224, cap:"Potion of Demon Slaying", kind:"dust", c:"#b9ab90"},
+  largeRadiantShard: {id:11178, cap:"Large Radiant Shard", kind:"dust", c:"#b9ab90"},
+  greaterNetherEssence: {id:11175, cap:"Greater Nether Essence", kind:"dust", c:"#b9ab90"},
+  felCrystal: {id:248819, cap:"Fel Crystal", kind:"dust", c:"#b9ab90"},
+  azerothiumBar: {id:249726, cap:"Azerothium Bar", kind:"dust", c:"#b9ab90"},
+  stranglevine: {id:249274, cap:"Stranglevine", kind:"dust", c:"#b9ab90"},
+  nexusCrystal: {id:20725, cap:"Nexus Crystal", kind:"dust", c:"#b9ab90"},
+  torbernite: {id:248820, cap:"Torbernite", kind:"dust", c:"#b9ab90"},
+  livingEssence: {id:12803, cap:"Living Essence", kind:"dust", c:"#b9ab90"},
+  essenceOfWater: {id:7080, cap:"Essence of Water", kind:"dust", c:"#b9ab90"},
+  smallBrilliantShard: {id:14343, cap:"Small Brilliant Shard", kind:"dust", c:"#b9ab90"},
+  icecap: {id:13467, cap:"Icecap", kind:"dust", c:"#b9ab90"},
+  lesserMagicEssence: {id:10938, cap:"Lesser Magic Essence", kind:"dust", c:"#b9ab90"},
+  lesserAstralEssence: {id:10998, cap:"Lesser Astral Essence", kind:"dust", c:"#b9ab90"},
+  essenceOfUndeath: {id:12808, cap:"Essence of Undeath", kind:"dust", c:"#b9ab90"},
+  smallGlimmeringShard: {id:10978, cap:"Small Glimmering Shard", kind:"dust", c:"#b9ab90"},
+  greaterMagicEssence: {id:10939, cap:"Greater Magic Essence", kind:"dust", c:"#b9ab90"},
+  goldenPearl: {id:13926, cap:"Golden Pearl", kind:"dust", c:"#b9ab90"},
+  essenceOfEarth: {id:7076, cap:"Essence of Earth", kind:"dust", c:"#b9ab90"},
+  arcaneCrystal: {id:12363, cap:"Arcane Crystal", kind:"dust", c:"#b9ab90"},
+  aquamarine: {id:7909, cap:"Aquamarine", kind:"dust", c:"#b9ab90"},
+  lesserMysticEssence: {id:11134, cap:"Lesser Mystic Essence", kind:"dust", c:"#b9ab90"},
+  lesserEternalEssence: {id:16202, cap:"Lesser Eternal Essence", kind:"dust", c:"#b9ab90"},
+  moteOfMagic: {id:247786, cap:"Mote of Magic", kind:"dust", c:"#b9ab90"},
+  greaterMysticEssence: {id:11135, cap:"Greater Mystic Essence", kind:"dust", c:"#b9ab90"},
+  smallGlowingShard: {id:11138, cap:"Small Glowing Shard", kind:"dust", c:"#b9ab90"},
+  guardianStone: {id:12809, cap:"Guardian Stone", kind:"dust", c:"#b9ab90"},
+  fireOil: {id:6371, cap:"Fire Oil", kind:"dust", c:"#b9ab90"},
+  elementalFire: {id:7068, cap:"Elemental Fire", kind:"dust", c:"#b9ab90"},
+  heartOfFire: {id:7077, cap:"Heart of Fire", kind:"dust", c:"#b9ab90"},
+  coreOfEarth: {id:7075, cap:"Core of Earth", kind:"dust", c:"#b9ab90"},
+  globeOfWater: {id:7079, cap:"Globe of Water", kind:"dust", c:"#b9ab90"},
+  breathOfWind: {id:7081, cap:"Breath of Wind", kind:"dust", c:"#b9ab90"},
+  shadowProtectionPotion: {id:6048, cap:"Shadow Protection Potion", kind:"dust", c:"#b9ab90"},
+  deathLotus: {id:248822, cap:"Death Lotus", kind:"dust", c:"#b9ab90"},
+  blackmouthOil: {id:6370, cap:"Blackmouth Oil", kind:"dust", c:"#b9ab90"},
+  skinOfShadow: {id:12753, cap:"Skin of Shadow", kind:"dust", c:"#b9ab90"},
+  wildvine: {id:8153, cap:"Wildvine", kind:"dust", c:"#b9ab90"},
+  sungrass: {id:8838, cap:"Sungrass", kind:"dust", c:"#b9ab90"},
+  kingsblood: {id:3356, cap:"Kingsblood", kind:"dust", c:"#b9ab90"},
+  truesilverBar: {id:6037, cap:"Truesilver Bar", kind:"dust", c:"#b9ab90"},
+  ironOre: {id:2772, cap:"Iron Ore", kind:"dust", c:"#b9ab90"},
+  curedRuggedHide: {id:15407, cap:"Cured Rugged Hide", kind:"dust", c:"#b9ab90"},
+  greenWhelpScale: {id:7392, cap:"Green Whelp Scale", kind:"dust", c:"#b9ab90"},
+  larvalAcid: {id:18512, cap:"Larval Acid", kind:"dust", c:"#b9ab90"},
+  bloodOfHeroes: {id:12938, cap:"Blood of Heroes", kind:"dust", c:"#b9ab90"},
+  frostOil: {id:3829, cap:"Frost Oil", kind:"dust", c:"#b9ab90"},
 };
+// Енчанти (id і реагенти з Wowhead). Коди EN01.. = порядок у списку: нове додавай ТІЛЬКИ в кінець.
+const ENCH = [
+  {s:"Bracer", name:"Enchant Bracer - Inferior Stamina", sp:7418, ic:"spell_holy_greaterheal", rod:"Copper", mats:{moteOfMagic:1}},
+  {s:"Bracer", name:"Enchant Bracer - Minor Agility", sp:7779, ic:"spell_holy_greaterheal", rod:"Copper", mats:{strangeDust:1, lesserMagicEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Minor Deflect", sp:7428, ic:"spell_holy_greaterheal", rod:"Copper", mats:{lesserMagicEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Minor Healing Power", sp:1248459, ic:"inv_enchant_formulagood_01", rod:"Copper", mats:{lesserMagicEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Minor Intellect", sp:1248458, ic:"inv_enchant_formulagood_01", rod:"Copper", mats:{lesserMagicEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Minor Spirit", sp:7766, ic:"inv_enchant_formulagood_01", rod:"Copper", mats:{lesserMagicEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Minor Stamina", sp:7457, ic:"spell_holy_greaterheal", rod:"Copper", mats:{strangeDust:1}},
+  {s:"Bracer", name:"Enchant Bracer - Minor Strength", sp:7782, ic:"inv_enchant_formulagood_01", rod:"Copper", mats:{strangeDust:1}},
+  {s:"Bracer", name:"Enchant Bracer - Lesser Agility", sp:1248460, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{lesserMysticEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Lesser Intellect", sp:13622, ic:"spell_holy_greaterheal", rod:"Silver", mats:{greaterAstralEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Lesser Spirit", sp:7859, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{lesserAstralEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Lesser Stamina", sp:13501, ic:"spell_holy_greaterheal", rod:"Silver", mats:{soulDust:1}},
+  {s:"Bracer", name:"Enchant Bracer - Lesser Strength", sp:13536, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{soulDust:1}},
+  {s:"Bracer", name:"Enchant Bracer - Agility", sp:1248497, ic:"inv_enchant_formulagood_01", rod:"Golden", mats:{vision:1}},
+  {s:"Bracer", name:"Enchant Bracer - Lesser Deflection", sp:13646, ic:"inv_enchant_formulagood_01", rod:"Golden", mats:{lesserMysticEssence:1, soulDust:1}},
+  {s:"Bracer", name:"Enchant Bracer - Spirit", sp:13642, ic:"spell_holy_greaterheal", rod:"Golden", mats:{lesserMysticEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Stamina", sp:13648, ic:"spell_holy_greaterheal", rod:"Golden", mats:{soulDust:1}},
+  {s:"Bracer", name:"Enchant Bracer - Strength", sp:13661, ic:"spell_holy_greaterheal", rod:"Golden", mats:{vision:1}},
+  {s:"Bracer", name:"Enchant Bracer - Deflection", sp:13931, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{lesserNetherEssence:1, dreamDust:1}},
+  {s:"Bracer", name:"Enchant Bracer - Greater Agility", sp:1248500, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{dreamDust:1, lesserNetherEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Greater Intellect", sp:20008, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{lesserEternalEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Greater Spirit", sp:13846, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{lesserNetherEssence:1, vision:1}},
+  {s:"Bracer", name:"Enchant Bracer - Greater Stamina", sp:13945, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{dreamDust:1}},
+  {s:"Bracer", name:"Enchant Bracer - Greater Strength", sp:13939, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{dreamDust:1, lesserNetherEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Intellect", sp:13822, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{lesserNetherEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Lesser Healing Power", sp:1248498, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{lesserMysticEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Superior Agility", sp:1248599, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{illusionDust:1, gee:1, lbs:1}},
+  {s:"Bracer", name:"Enchant Bracer - Superior Deflection", sp:1248665, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{lbs:1}},
+  {s:"Bracer", name:"Enchant Bracer - Superior Intellect", sp:1248661, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{gee:1}},
+  {s:"Bracer", name:"Enchant Bracer - Superior Spirit", sp:20009, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{lesserEternalEssence:1, dreamDust:1}},
+  {s:"Bracer", name:"Enchant Bracer - Superior Stamina", sp:20011, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{illusionDust:1}},
+  {s:"Bracer", name:"Enchant Bracer - Superior Strength", sp:20010, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{illusionDust:1, gee:1}},
+  {s:"Bracer", name:"Enchant Bracer - Greater Spellpower", sp:1220624, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{gee:1, illusionDust:1, essenceOfUndeath:1, pLotus:1}},
+  {s:"Bracer", name:"Enchant Bracer - Healing Power", sp:23802, ic:"inv_misc_note_01", rod:"Arcanite", mats:{lbs:1, illusionDust:1, gee:1, livingEssence:1}},
+  {s:"Bracer", name:"Enchant Bracer - Mana Regeneration", sp:23801, ic:"inv_misc_note_01", rod:"Arcanite", mats:{illusionDust:1, gee:1, essenceOfWater:1}},
+  {s:"Bracer", name:"Enchant Bracer - Spell Power", sp:1217189, ic:"spell_holy_greaterheal", rod:"Arcanite", mats:{lbs:1, illusionDust:1, gee:1, essenceOfWater:1, fireE:1, essenceOfAir:1}},
+  {s:"Chest", name:"Enchant Chest - Inferior Stamina", sp:7420, ic:"spell_holy_greaterheal", rod:"Copper", mats:{strangeDust:1}},
+  {s:"Chest", name:"Enchant Chest - Lesser Intellect", sp:7776, ic:"inv_enchant_formulagood_01", rod:"Copper", mats:{lesserMagicEssence:1}},
+  {s:"Chest", name:"Enchant Chest - Lesser Stamina", sp:7748, ic:"spell_holy_greaterheal", rod:"Copper", mats:{strangeDust:1, lesserMagicEssence:1}},
+  {s:"Chest", name:"Enchant Chest - Minor Absorption", sp:7426, ic:"spell_holy_greaterheal", rod:"Copper", mats:{lesserMagicEssence:1}},
+  {s:"Chest", name:"Enchant Chest - Minor Intellect", sp:7443, ic:"inv_enchant_formulagood_01", rod:"Copper", mats:{lesserMagicEssence:1}},
+  {s:"Chest", name:"Enchant Chest - Absorption", sp:1249071, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{dreamDust:1, greaterNetherEssence:1, largeRadiantShard:1}},
+  {s:"Chest", name:"Enchant Chest - Intellect", sp:13607, ic:"spell_holy_greaterheal", rod:"Silver", mats:{greaterAstralEssence:1}},
+  {s:"Chest", name:"Enchant Chest - Lesser Absorption", sp:13538, ic:"spell_holy_greaterheal", rod:"Silver", mats:{strangeDust:1, lesserAstralEssence:1, largeGlimmeringShard:1}},
+  {s:"Chest", name:"Enchant Chest - Minor Stats", sp:13626, ic:"spell_holy_greaterheal", rod:"Silver", mats:{lesserAstralEssence:1, soulDust:1, largeGlimmeringShard:1}},
+  {s:"Chest", name:"Enchant Chest - Stamina", sp:7857, ic:"spell_holy_greaterheal", rod:"Silver", mats:{strangeDust:1, lesserAstralEssence:1}},
+  {s:"Chest", name:"Enchant Chest - Greater Intellect", sp:13663, ic:"spell_holy_greaterheal", rod:"Golden", mats:{lesserMysticEssence:1}},
+  {s:"Chest", name:"Enchant Chest - Greater Stamina", sp:13640, ic:"spell_holy_greaterheal", rod:"Golden", mats:{soulDust:1}},
+  {s:"Chest", name:"Enchant Chest - Lesser Stats", sp:13700, ic:"spell_holy_greaterheal", rod:"Golden", mats:{greaterMysticEssence:1, vision:1, largeGlowingShard:1}},
+  {s:"Chest", name:"Enchant Chest - Major Intellect", sp:20028, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{gee:1, smallBrilliantShard:1}},
+  {s:"Chest", name:"Enchant Chest - Major Stamina", sp:20026, ic:"inv_misc_note_01", rod:"Truesilver", mats:{illusionDust:1, smallBrilliantShard:1}},
+  {s:"Chest", name:"Enchant Chest - Stats", sp:13941, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{largeRadiantShard:1, dreamDust:1, greaterNetherEssence:1}},
+  {s:"Chest", name:"Enchant Chest - Superior Intellect", sp:13917, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{greaterNetherEssence:1}},
+  {s:"Chest", name:"Enchant Chest - Superior Stamina", sp:13858, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{vision:1}},
+  {s:"Chest", name:"Enchant Chest - Greater Stats", sp:20025, ic:"inv_enchant_formulagood_01", rod:"Arcanite", mats:{lbs:1, illusionDust:1, gee:1}},
+  {s:"Cloak", name:"Enchant Cloak - Lesser Protection", sp:13421, ic:"spell_holy_greaterheal", rod:"Copper", mats:{strangeDust:1, smallGlimmeringShard:1}},
+  {s:"Cloak", name:"Enchant Cloak - Minor Protection", sp:7771, ic:"inv_enchant_formulagood_01", rod:"Copper", mats:{strangeDust:1}},
+  {s:"Cloak", name:"Enchant Cloak - Minor Resistance", sp:7454, ic:"spell_holy_greaterheal", rod:"Copper", mats:{strangeDust:1, lesserMagicEssence:1}},
+  {s:"Cloak", name:"Enchant Cloak - Lesser Fire Resistance", sp:7861, ic:"spell_holy_greaterheal", rod:"Silver", mats:{fireOil:1, lesserAstralEssence:1}},
+  {s:"Cloak", name:"Enchant Cloak - Lesser Shadow Resistance", sp:13522, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{lesserAstralEssence:1, shadowProtectionPotion:1}},
+  {s:"Cloak", name:"Enchant Cloak - Minor Agility", sp:13419, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{lesserAstralEssence:1}},
+  {s:"Cloak", name:"Enchant Cloak - Defense", sp:13635, ic:"spell_holy_greaterheal", rod:"Golden", mats:{smallGlowingShard:1, soulDust:1}},
+  {s:"Cloak", name:"Enchant Cloak - Fire Resistance", sp:13657, ic:"spell_holy_greaterheal", rod:"Golden", mats:{lesserMysticEssence:1, elementalFire:1}},
+  {s:"Cloak", name:"Enchant Cloak - Greater Defense", sp:13746, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{vision:1}},
+  {s:"Cloak", name:"Enchant Cloak - Greater Resistance", sp:20014, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{lesserEternalEssence:1, heartOfFire:1, coreOfEarth:1, globeOfWater:1, breathOfWind:1, ichor:1}},
+  {s:"Cloak", name:"Enchant Cloak - Lesser Agility", sp:13882, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{lesserNetherEssence:1}},
+  {s:"Cloak", name:"Enchant Cloak - Superior Defense", sp:20015, ic:"inv_misc_note_01", rod:"Truesilver", mats:{illusionDust:1}},
+  {s:"Cloak", name:"Enchant Cloak - Agility", sp:1219587, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{gee:1, illusionDust:1, fireE:1}},
+  {s:"Cloak", name:"Enchant Cloak - Dodge", sp:25086, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{nexusCrystal:1, lbs:1, guardianStone:1}},
+  {s:"Cloak", name:"Enchant Cloak - Greater Fire Resistance", sp:25081, ic:"inv_misc_note_01", rod:"Arcanite", mats:{nexusCrystal:1, lbs:1, fireE:1}},
+  {s:"Cloak", name:"Enchant Cloak - Greater Nature Resistance", sp:25082, ic:"inv_misc_note_01", rod:"Arcanite", mats:{nexusCrystal:1, lbs:1, livingEssence:1}},
+  {s:"Boots", name:"Enchant Boots - Minor Agility", sp:7867, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{strangeDust:1, lesserAstralEssence:1}},
+  {s:"Boots", name:"Enchant Boots - Minor Stamina", sp:7863, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{strangeDust:1}},
+  {s:"Boots", name:"Enchant Boots - Lesser Agility", sp:13637, ic:"spell_holy_greaterheal", rod:"Golden", mats:{soulDust:1}},
+  {s:"Boots", name:"Enchant Boots - Lesser Spirit", sp:13687, ic:"inv_enchant_formulagood_01", rod:"Golden", mats:{lesserMysticEssence:1}},
+  {s:"Boots", name:"Enchant Boots - Lesser Stamina", sp:13644, ic:"spell_holy_greaterheal", rod:"Golden", mats:{soulDust:1}},
+  {s:"Boots", name:"Enchant Boots - Agility", sp:13935, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{greaterNetherEssence:1}},
+  {s:"Boots", name:"Enchant Boots - Greater Agility", sp:20023, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{gee:1}},
+  {s:"Boots", name:"Enchant Boots - Greater Stamina", sp:20020, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{dreamDust:1}},
+  {s:"Boots", name:"Enchant Boots - Minor Speed", sp:13890, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{smallRadiantShard:1, aquamarine:1, lesserNetherEssence:1}},
+  {s:"Boots", name:"Enchant Boots - Spirit", sp:20024, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{gee:1, lesserEternalEssence:1}},
+  {s:"Boots", name:"Enchant Boots - Stamina", sp:13836, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{vision:1}},
+  {s:"Gloves", name:"Enchant Gloves - Fishing", sp:13620, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{soulDust:1, blackmouthOil:1}},
+  {s:"Gloves", name:"Enchant Gloves - Herbalism", sp:13617, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{soulDust:1, kingsblood:1}},
+  {s:"Gloves", name:"Enchant Gloves - Mining", sp:13612, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{soulDust:1, ironOre:1}},
+  {s:"Gloves", name:"Enchant Gloves - Skinning", sp:13698, ic:"inv_enchant_formulagood_01", rod:"Golden", mats:{vision:1, greenWhelpScale:1}},
+  {s:"Gloves", name:"Enchant Gloves - Advanced Herbalism", sp:13868, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{vision:1, sungrass:1}},
+  {s:"Gloves", name:"Enchant Gloves - Advanced Mining", sp:13841, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{vision:1, truesilverBar:1}},
+  {s:"Gloves", name:"Enchant Gloves - Advanced Skinning", sp:1248528, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{dreamDust:1, curedRuggedHide:1}},
+  {s:"Gloves", name:"Enchant Gloves - Agility", sp:13815, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{vision:1}},
+  {s:"Gloves", name:"Enchant Gloves - Greater Agility", sp:20012, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{lesserEternalEssence:1, illusionDust:1}},
+  {s:"Gloves", name:"Enchant Gloves - Greater Strength", sp:20013, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{gee:1, illusionDust:1}},
+  {s:"Gloves", name:"Enchant Gloves - Minor Haste", sp:13948, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{largeRadiantShard:1, wildvine:1}},
+  {s:"Gloves", name:"Enchant Gloves - Riding Skill", sp:13947, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{largeRadiantShard:1, dreamDust:1}},
+  {s:"Gloves", name:"Enchant Gloves - Strength", sp:13887, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{lesserNetherEssence:1, vision:1}},
+  {s:"Gloves", name:"Enchant Gloves - Arcane Power", sp:1213626, ic:"inv_enchant_formulagood_01", rod:"Arcanite", mats:{nexusCrystal:1, lbs:1, skinOfShadow:1}},
+  {s:"Gloves", name:"Enchant Gloves - Fire Power", sp:25078, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{nexusCrystal:1, lbs:1, fireE:1}},
+  {s:"Gloves", name:"Enchant Gloves - Frost Power", sp:25074, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{nexusCrystal:1, lbs:1, essenceOfWater:1}},
+  {s:"Gloves", name:"Enchant Gloves - Healing Power", sp:25079, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{nexusCrystal:1, lbs:1, righteousOrb:1}},
+  {s:"Gloves", name:"Enchant Gloves - Lotus Claw", sp:1294054, ic:"inv_enchant_formulagood_01", rod:"Arcanite", mats:{deathLotus:1, smallBrilliantShard:1, illusionDust:1, lesserEternalEssence:1}},
+  {s:"Gloves", name:"Enchant Gloves - Shadow Power", sp:25073, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{nexusCrystal:1, lbs:1, essenceOfUndeath:1}},
+  {s:"Gloves", name:"Enchant Gloves - Superior Agility", sp:25080, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{nexusCrystal:1, lbs:1, essenceOfAir:1}},
+  {s:"Gloves", name:"Enchant Gloves - Superior Strength", sp:1248640, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{nexusCrystal:1, gee:1, essenceOfEarth:1}},
+  {s:"Gloves", name:"Enchant Gloves - Threat", sp:25072, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{nexusCrystal:1, lbs:1, larvalAcid:1}},
+  {s:"Shield", name:"Enchant Shield - Minor Stamina", sp:13378, ic:"spell_holy_greaterheal", rod:"Copper", mats:{lesserAstralEssence:1, strangeDust:1}},
+  {s:"Shield", name:"Enchant Shield - Lesser Protection", sp:13464, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{strangeDust:1, smallGlimmeringShard:1}},
+  {s:"Shield", name:"Enchant Shield - Lesser Spirit", sp:13485, ic:"spell_holy_greaterheal", rod:"Silver", mats:{lesserAstralEssence:1, strangeDust:1}},
+  {s:"Shield", name:"Enchant Shield - Lesser Block", sp:13689, ic:"inv_enchant_formulagood_01", rod:"Golden", mats:{greaterMysticEssence:1, vision:1, largeGlowingShard:1}},
+  {s:"Shield", name:"Enchant Shield - Lesser Stamina", sp:13631, ic:"spell_holy_greaterheal", rod:"Golden", mats:{lesserMysticEssence:1}},
+  {s:"Shield", name:"Enchant Shield - Spirit", sp:13659, ic:"spell_holy_greaterheal", rod:"Golden", mats:{lesserMysticEssence:1, vision:1}},
+  {s:"Shield", name:"Enchant Shield - Frost Resistance", sp:13933, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{largeRadiantShard:1, frostOil:1}},
+  {s:"Shield", name:"Enchant Shield - Greater Spirit", sp:13905, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{lesserNetherEssence:1, dreamDust:1}},
+  {s:"Shield", name:"Enchant Shield - Greater Stamina", sp:20017, ic:"inv_misc_note_01", rod:"Truesilver", mats:{dreamDust:1}},
+  {s:"Shield", name:"Enchant Shield - Stamina", sp:13817, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{vision:1}},
+  {s:"Shield", name:"Enchant Shield - Superior Spirit", sp:20016, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{gee:1, illusionDust:1}},
+  {s:"Shield", name:"Enchant Shield - Critical Strike", sp:1220623, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{lbs:1, illusionDust:1, bloodOfHeroes:1}},
+  {s:"Shield", name:"Enchant Shield - Excellent Stamina", sp:1219581, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{lbs:1, illusionDust:1, essenceOfEarth:1}},
+  {s:"Weapon", name:"Enchant Weapon - Minor Beastslayer", sp:7786, ic:"inv_enchant_formulagood_01", rod:"Copper", mats:{strangeDust:1, greaterMagicEssence:1}},
+  {s:"Weapon", name:"Enchant Weapon - Minor Striking", sp:7788, ic:"spell_holy_greaterheal", rod:"Copper", mats:{strangeDust:1, lesserMagicEssence:1, smallGlimmeringShard:1}},
+  {s:"Weapon", name:"Enchant Weapon - Insight", sp:1248757, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{strangeDust:1, largeGlimmeringShard:1, greaterAstralEssence:1, pyrite:1, frilledLichen:1}},
+  {s:"Weapon", name:"Enchant Weapon - Recovery", sp:1248760, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{soulDust:1, largeGlimmeringShard:1, greaterAstralEssence:1, pyrite:1, silverOre:1}},
+  {s:"Weapon", name:"Enchant Weapon - Revelation", sp:1248805, ic:"inv_enchant_formulagood_01", rod:"Silver", mats:{soulDust:1, largeGlimmeringShard:1, greaterAstralEssence:1, cerulean:1, sulfuricAcid:1}},
+  {s:"Weapon", name:"Enchant Weapon - Demonslaying", sp:13915, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{smallRadiantShard:1, dreamDust:1, potionOfDemonSlaying:1}},
+  {s:"Weapon", name:"Enchant Weapon - Fiery Weapon", sp:13898, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{smallRadiantShard:1, fireE:1}},
+  {s:"Weapon", name:"Enchant Weapon - Greater Striking", sp:13943, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{largeRadiantShard:1, greaterNetherEssence:1}},
+  {s:"Weapon", name:"Enchant Weapon - Icy Chill", sp:20029, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{smallBrilliantShard:1, essenceOfWater:1, essenceOfAir:1, icecap:1}},
+  {s:"Weapon", name:"Enchant Weapon - Agility", sp:23800, ic:"inv_misc_note_01", rod:"Arcanite", mats:{lbs:1, gee:1, illusionDust:1, essenceOfAir:1}},
+  {s:"Weapon", name:"Enchant Weapon - Crusader", sp:20034, ic:"inv_enchant_formulagood_01", rod:"Arcanite", mats:{lbs:1, righteousOrb:1}},
+  {s:"Weapon", name:"Enchant Weapon - Healing Power", sp:22750, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{lbs:1, gee:1, livingEssence:1, essenceOfWater:1, righteousOrb:1}},
+  {s:"Weapon", name:"Enchant Weapon - Lifestealing", sp:20032, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{lbs:1, essenceOfUndeath:1, livingEssence:1}},
+  {s:"Weapon", name:"Enchant Weapon - Mighty Intellect", sp:23804, ic:"inv_misc_note_01", rod:"Arcanite", mats:{lbs:1, gee:1, illusionDust:1}},
+  {s:"Weapon", name:"Enchant Weapon - Mighty Spirit", sp:23803, ic:"inv_misc_note_01", rod:"Arcanite", mats:{lbs:1, gee:1, illusionDust:1}},
+  {s:"Weapon", name:"Enchant Weapon - Spell Power", sp:22749, ic:"inv_enchant_formulasuperior_01", rod:"Arcanite", mats:{lbs:1, gee:1, fireE:1, essenceOfWater:1, essenceOfAir:1, goldenPearl:1}},
+  {s:"Weapon", name:"Enchant Weapon - Strength", sp:23799, ic:"inv_misc_note_01", rod:"Arcanite", mats:{lbs:1, gee:1, illusionDust:1, essenceOfEarth:1}},
+  {s:"Weapon", name:"Enchant Weapon - Superior Striking", sp:20031, ic:"inv_enchant_formulagood_01", rod:"Arcanite", mats:{lbs:1, gee:1}},
+  {s:"Weapon", name:"Enchant Weapon - Unholy Weapon", sp:20033, ic:"inv_enchant_formulagood_01", rod:"Arcanite", mats:{lbs:1, essenceOfUndeath:1}},
+  {s:"2H Weapon", name:"Enchant 2H Weapon - Lesser Intellect", sp:7793, ic:"inv_misc_note_01", rod:"Copper", mats:{lesserMagicEssence:1}},
+  {s:"2H Weapon", name:"Enchant 2H Weapon - Lesser Spirit", sp:13380, ic:"inv_enchant_formulagood_01", rod:"Copper", mats:{lesserAstralEssence:1, strangeDust:1}},
+  {s:"2H Weapon", name:"Enchant 2H Weapon - Minor Impact", sp:7745, ic:"spell_holy_greaterheal", rod:"Copper", mats:{strangeDust:1, smallGlimmeringShard:1}},
+  {s:"2H Weapon", name:"Enchant 2H Weapon - Lesser Impact", sp:13529, ic:"spell_holy_greaterheal", rod:"Silver", mats:{soulDust:1, largeGlimmeringShard:1}},
+  {s:"2H Weapon", name:"Enchant 2H Weapon - Greater Impact", sp:13937, ic:"spell_holy_greaterheal", rod:"Truesilver", mats:{largeRadiantShard:1, dreamDust:1}},
+  {s:"2H Weapon", name:"Enchant 2H Weapon - Lesser Agility", sp:1248510, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{vision:1, largeGlowingShard:1, lesserNetherEssence:1}},
+  {s:"2H Weapon", name:"Enchant 2H Weapon - Lesser Strength", sp:1248511, ic:"inv_enchant_formulagood_01", rod:"Truesilver", mats:{vision:1, largeGlowingShard:1, lesserNetherEssence:1}},
+  {s:"2H Weapon", name:"Enchant 2H Weapon - Agility", sp:27837, ic:"inv_misc_note_01", rod:"Arcanite", mats:{lbs:1, gee:1, illusionDust:1, essenceOfAir:1}},
+  {s:"2H Weapon", name:"Enchant 2H Weapon - Major Intellect", sp:20036, ic:"inv_enchant_formulagood_01", rod:"Arcanite", mats:{gee:1, lbs:1}},
+  {s:"2H Weapon", name:"Enchant 2H Weapon - Major Spirit", sp:20035, ic:"inv_enchant_formulagood_01", rod:"Arcanite", mats:{gee:1, lbs:1}},
+  {s:"2H Weapon", name:"Enchant 2H Weapon - Mighty Healing Power", sp:1248636, ic:"inv_enchant_formulagood_01", rod:"Arcanite", mats:{felCrystal:1, gee:1, azerothiumBar:1, stranglevine:1, nexusCrystal:1, torbernite:1}},
+  {s:"2H Weapon", name:"Enchant 2H Weapon - Mighty Spell Power", sp:1248607, ic:"inv_enchant_formulagood_01", rod:"Arcanite", mats:{felCrystal:1, gee:1, essenceOfEarth:1, essenceOfUndeath:1, nexusCrystal:1, torbernite:1}},
+  {s:"2H Weapon", name:"Enchant 2H Weapon - Strength", sp:1248668, ic:"inv_enchant_formulagood_01", rod:"Arcanite", mats:{lbs:1, gee:1, illusionDust:1, arcaneCrystal:1}},
+  {s:"2H Weapon", name:"Enchant 2H Weapon - Superior Impact", sp:20030, ic:"inv_enchant_formulagood_01", rod:"Arcanite", mats:{lbs:1, illusionDust:1}},
+];
 // Вендор (мідь): нитки і фарби купую я
 const V = {coarse:10, fine:100, silken:500, hSilken:2000, runeT:5000, red:50, green:100, black:1000};
 
@@ -381,13 +638,117 @@ function showResult(m){
 $("gen").onclick = () => showResult("mats");
 $("back").onclick = () => { $("resView").hidden = true; $("pickView").hidden = false; scrollTo(0,0); };
 
-function tab(which){
-  $("v-order").hidden = which !== "order"; $("v-recipes").hidden = which !== "recipes";
-  $("t-order").setAttribute("aria-selected", which === "order"); $("t-recipes").setAttribute("aria-selected", which === "recipes");
+let TOP = "order", SUB = "ta";
+function go(){
+  const on = {"v-order": TOP==="order"&&SUB==="ta", "v-ord-ench": TOP==="order"&&SUB==="en", "v-recipes": TOP==="recipes"&&SUB==="ta", "v-rec-ench": TOP==="recipes"&&SUB==="en"};
+  Object.entries(on).forEach(([id,v]) => $(id).hidden = !v);
+  $("t-order").setAttribute("aria-selected", TOP==="order"); $("t-recipes").setAttribute("aria-selected", TOP==="recipes");
+  $("s-ta").setAttribute("aria-selected", SUB==="ta"); $("s-en").setAttribute("aria-selected", SUB==="en");
 }
-$("t-order").onclick = () => tab("order"); $("t-recipes").onclick = () => tab("recipes");
+$("t-order").onclick = () => { TOP = "order"; go(); }; $("t-recipes").onclick = () => { TOP = "recipes"; go(); };
+$("s-ta").onclick = () => { SUB = "ta"; go(); }; $("s-en").onclick = () => { SUB = "en"; go(); };
 document.getElementById("sections").innerHTML = SECTIONS.map(s=>`
   <section><h2>${s.title}</h2><div class="rows">${s.items.map(row).join("")}</div></section>`).join("");
+
+// ===================== Енчантинг =====================
+ENCH.forEach((e,i) => e.code = "EN" + String(i+1).padStart(2,"0"));
+const SLOTS = [...new Set(ENCH.map(e => e.s))];
+let KNOWN = null;                                                // null = known.json нема, показуємо все
+fetch("known.json", {cache:"no-store"}).then(r => r.ok ? r.json() : null).then(j => { if(j && Array.isArray(j.ench)){ KNOWN = new Set(j.ench); renderEnch(); } }).catch(() => {});
+const isKnown = e => !KNOWN || KNOWN.has(e.code);   // known.json з аддона; нема файлу = показуємо все
+const qtyE = {};
+let enSlot = SLOTS[0];
+const enMats = e => Object.entries(e.mats).map(([k,n]) => { const m = MAT[k]; return `
+  <div class="mat"><div class="top"><span class="n">${n}×</span></div><span class="slot sm">${wh(m.id,m.cap,icon(m))}</span><span class="cap">${wh(m.id,m.cap,m.cap)}</span></div>`; }).join("");
+function enCost(e){ let c = 0; for(const [k,n] of Object.entries(e.mats)){ const u = unit(k); if(!u) return 0; c += u*n; } return c; }
+const enLink = (e,inner) => `<a class="wh" href="https://www.wowhead.com/forever/spell=${e.sp}" target="_blank" rel="noopener">${inner}</a>`;
+const slotBtns = slots => slots.map(s => `<button type="button" role="tab" data-s="${s}" aria-selected="${s===enSlot}">${s}</button>`).join("");
+const enHead = e => `<div class="item"><span class="slot big">${enLink(e,`<img src="icons/e_${e.ic}.jpg" alt="" style="width:100%;height:100%;display:block;border-radius:4px">`)}</span>
+  <div style="min-width:0"><div class="name">${enLink(e,e.name.replace(/^Enchant /,""))}</div>${EDIT_ROW}</div></div>`;
+let EDIT_ROW = "";
+function renderEnch(){
+  const vis = ENCH.filter(isKnown), slots = SLOTS.filter(s => vis.some(e => e.s === s));
+  if(!slots.includes(enSlot)) enSlot = slots[0];
+  $("enSide").innerHTML = slotBtns(slots);
+  $("enList").innerHTML = `<div class="rows">${vis.filter(e => e.s === enSlot).map(e => { const c = enCost(e), q = qtyE[e.code]||0; EDIT_ROW = ""; return `
+    <div class="enrow ${q?"on":""}" data-code="${e.code}">
+      ${enHead(e)}
+      <div class="qty"><button type="button" data-d="-1" aria-label="Менше" ${q?"":"disabled"}>−</button><input type="number" min="0" max="99" inputmode="numeric" value="${q}" aria-label="${e.name}: кількість"><button type="button" data-d="1" aria-label="Більше">+</button></div>
+      <div class="mats" style="grid-column:1/-1">${enMats(e)}${c ? `<span class="plus">=</span>${coins(c)}` : ""}</div>
+    </div>`; }).join("")}</div>`;
+  renderEnchRec();
+}
+function renderEnchRec(){
+  const vis = ENCH.filter(isKnown), slots = SLOTS.filter(s => vis.some(e => e.s === s));
+  if(!slots.includes(enSlot)) enSlot = slots[0];
+  $("enSide2").innerHTML = slotBtns(slots);
+  $("enList2").innerHTML = `<div class="rows">${vis.filter(e => e.s === enSlot).map(e => { const c = enCost(e); EDIT_ROW = `<div class="code"><span class="codelbl">Код:</span> ${e.code}</div>`; return `
+    <div class="enrow">
+      ${enHead(e)}
+      <div class="mats" style="grid-column:1/-1">${enMats(e)}${c ? `<span class="plus">=</span>${coins(c)}` : ""}</div>
+    </div>`; }).join("")}</div>`;
+}
+function setQtyE(code, v){
+  qtyE[code] = Math.max(0, Math.min(99, parseInt(v,10) || 0));
+  const n = ENCH.reduce((a,e) => a + (qtyE[e.code]||0), 0);
+  $("enGen").textContent = n ? `Сформувати (${n})` : "Сформувати"; $("enGen").disabled = n === 0;
+}
+["enSide","enSide2"].forEach(id => $(id).addEventListener("click", e => { const b = e.target.closest("button[data-s]"); if(b){ enSlot = b.dataset.s; renderEnch(); } }));
+$("enList").addEventListener("click", e => {
+  const b = e.target.closest("button[data-d]"); if(!b) return;
+  const code = b.closest(".enrow").dataset.code; setQtyE(code, (qtyE[code]||0) + +b.dataset.d); renderEnch();
+});
+$("enList").addEventListener("change", e => {
+  const row = e.target.closest(".enrow"); if(row){ setQtyE(row.dataset.code, e.target.value); renderEnch(); }
+});
+
+let enMode = "mats";
+function showEnchResult(m){
+  enMode = m || "mats";
+  const chosen = ENCH.filter(e => qtyE[e.code] > 0);
+  const tot = {};
+  chosen.forEach(e => Object.entries(e.mats).forEach(([k,n]) => tot[k] = (tot[k]||0) + n*qtyE[e.code]));
+  const canGold = Object.keys(tot).some(unit);
+  if(!canGold) enMode = "mats";
+  const gold = enMode === "gold";
+  let paid = "", lastSeen = "", copper = 0;
+  if(gold){
+    paid = Object.keys(MAT).filter(k => tot[k] && unit(k)).map(k => {
+      const c = tot[k] * unit(k); copper += c;
+      if(PRICES.items[k].seen > lastSeen) lastSeen = PRICES.items[k].seen;
+      return `<li><b>${wh(MAT[k].id,MAT[k].cap,MAT[k].cap)}</b> ×${tot[k]} — ${coins(c)}</li>`;
+    }).join("");
+    copper = Math.ceil(copper / 100) * 100;
+  }
+  const mats = Object.keys(MAT).filter(k => tot[k] && !(gold && unit(k))).map(k => `
+    <div class="mat"><div class="top"><span class="n">${tot[k]}×</span></div><span class="slot sm">${wh(MAT[k].id,MAT[k].cap,icon(MAT[k]))}</span><span class="cap">${wh(MAT[k].id,MAT[k].cap,MAT[k].cap)}</span></div>`).join("");
+  const lines = chosen.map(e => `<li><b>${enLink(e,e.name.replace(/^Enchant /,""))}</b> ×${qtyE[e.code]} — ${e.code}</li>`).join("");
+  const codes = chosen.flatMap(e => Array(qtyE[e.code]).fill(e.code)).join(" ");
+  $("enResBody").innerHTML = `
+    ${canGold ? `<div class="seg" role="group" aria-label="Спосіб оплати">
+      <button type="button" data-m="mats" aria-pressed="${!gold}">Матеріали</button>
+      <button type="button" data-m="gold" aria-pressed="${gold}">Тільки голда</button></div>` : ""}
+    <h2>Що надіслати</h2>
+    ${mats ? `<div class="mats">${mats}</div>` : ""}
+    ${copper ? `<div class="total">${mats ? '<span class="plus">+</span>' : ""}${coins(copper)}</div>` : ""}
+    ${gold ? `<div class="pricenote">Матеріали куплю я на аукціоні. Ціни від ${fmtDate(lastSeen)}, з запасом ${Math.round((MARKUP-1)*100)}%. Те, чого нема на аукціоні або що надто дороге, лишається матеріалами.</div>
+    <ul class="lines paid">${paid}</ul>` : ""}
+    <h2>Тема листа</h2>
+    <div class="codebox"><div class="code"><span class="codelbl">Код:</span> <span id="enCodeText">${codes}</span></div><button class="btn" id="enCopyCode" type="button">Копіювати</button></div>
+    <h2>Твоє замовлення</h2>
+    <ul class="lines">${lines}</ul>`;
+  $("enCopyCode").onclick = async () => {
+    try { await navigator.clipboard.writeText(codes); $("enCopyCode").textContent = "Скопійовано"; }
+    catch { const r = document.createRange(); r.selectNodeContents($("enCodeText")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+  };
+  $("enResBody").querySelectorAll(".seg button").forEach(b => b.onclick = () => showEnchResult(b.dataset.m));
+  $("enPick").hidden = true; $("enRes").hidden = false;
+  if(!m) scrollTo(0,0);
+}
+$("enGen").onclick = () => showEnchResult("mats");
+$("enBack").onclick = () => { $("enRes").hidden = true; $("enPick").hidden = false; scrollTo(0,0); };
+renderEnch();
+go();
 </script>
 
 </body></html>

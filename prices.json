@@ -1,13 +1,103 @@
 {
  "items": {
+  "aquamarine": {
+   "n": 9,
+   "p": 17599,
+   "seen": "2026-10-20"
+  },
+  "blackmouthOil": {
+   "n": 9,
+   "p": 250,
+   "seen": "2026-10-20"
+  },
+  "breathOfWind": {
+   "n": 5,
+   "p": 19999,
+   "seen": "2026-10-17"
+  },
   "cerulean": {
    "n": 9,
    "p": 17400,
    "seen": "2026-10-20"
   },
+  "dreamDust": {
+   "n": 8,
+   "p": 3449,
+   "seen": "2026-10-20"
+  },
+  "elementalFire": {
+   "n": 8,
+   "p": 566,
+   "seen": "2026-10-20"
+  },
+  "essenceOfWater": {
+   "n": 5,
+   "p": 50700,
+   "seen": "2026-10-19"
+  },
+  "fireOil": {
+   "n": 9,
+   "p": 50,
+   "seen": "2026-10-20"
+  },
+  "frilledLichen": {
+   "n": 8,
+   "p": 8000,
+   "seen": "2026-10-20"
+  },
+  "frostOil": {
+   "n": 7,
+   "p": 9490,
+   "seen": "2026-10-20"
+  },
+  "globeOfWater": {
+   "n": 7,
+   "p": 350000,
+   "seen": "2026-10-20"
+  },
+  "goldenPearl": {
+   "n": 9,
+   "p": 24500,
+   "seen": "2026-10-20"
+  },
+  "greaterAstralEssence": {
+   "n": 8,
+   "p": 2523,
+   "seen": "2026-10-20"
+  },
+  "greaterMagicEssence": {
+   "n": 8,
+   "p": 171,
+   "seen": "2026-10-20"
+  },
+  "greaterMysticEssence": {
+   "n": 8,
+   "p": 4450,
+   "seen": "2026-10-20"
+  },
+  "greaterNetherEssence": {
+   "n": 8,
+   "p": 69749,
+   "seen": "2026-10-20"
+  },
+  "greenWhelpScale": {
+   "n": 5,
+   "p": 29000,
+   "seen": "2026-10-17"
+  },
   "heavyL": {
    "n": 8,
    "p": 799,
+   "seen": "2026-10-20"
+  },
+  "illusionDust": {
+   "n": 2,
+   "p": 100000,
+   "seen": "2026-10-14"
+  },
+  "ironOre": {
+   "n": 8,
+   "p": 770,
    "seen": "2026-10-20"
   },
   "ironweb": {
@@ -15,9 +105,54 @@
    "p": 2698,
    "seen": "2026-10-20"
   },
+  "kingsblood": {
+   "n": 8,
+   "p": 724,
+   "seen": "2026-10-20"
+  },
+  "largeGlimmeringShard": {
+   "n": 8,
+   "p": 8573,
+   "seen": "2026-10-20"
+  },
+  "largeGlowingShard": {
+   "n": 8,
+   "p": 26699,
+   "seen": "2026-10-20"
+  },
+  "largeRadiantShard": {
+   "n": 8,
+   "p": 89999,
+   "seen": "2026-10-20"
+  },
   "lbs": {
    "n": 2,
    "p": 60050,
+   "seen": "2026-10-20"
+  },
+  "lesserAstralEssence": {
+   "n": 8,
+   "p": 687,
+   "seen": "2026-10-20"
+  },
+  "lesserEternalEssence": {
+   "n": 8,
+   "p": 20499,
+   "seen": "2026-10-20"
+  },
+  "lesserMagicEssence": {
+   "n": 9,
+   "p": 95,
+   "seen": "2026-10-20"
+  },
+  "lesserMysticEssence": {
+   "n": 8,
+   "p": 1787,
+   "seen": "2026-10-20"
+  },
+  "lesserNetherEssence": {
+   "n": 8,
+   "p": 19886,
    "seen": "2026-10-20"
   },
   "linen": {
@@ -35,6 +170,11 @@
    "p": 20000,
    "seen": "2026-10-20"
   },
+  "moteOfMagic": {
+   "n": 8,
+   "p": 10,
+   "seen": "2026-10-20"
+  },
   "pHide": {
    "n": 8,
    "p": 250,
@@ -50,6 +190,11 @@
    "p": 9390,
    "seen": "2026-10-20"
   },
+  "pyrite": {
+   "n": 8,
+   "p": 198,
+   "seen": "2026-10-20"
+  },
   "ruggedL": {
    "n": 8,
    "p": 528,
@@ -60,14 +205,74 @@
    "p": 9999,
    "seen": "2026-10-16"
   },
+  "shadowProtectionPotion": {
+   "n": 11,
+   "p": 4700,
+   "seen": "2026-10-20"
+  },
   "silk": {
    "n": 9,
    "p": 400,
    "seen": "2026-10-20"
   },
+  "silverOre": {
+   "n": 8,
+   "p": 1359,
+   "seen": "2026-10-20"
+  },
+  "smallBrilliantShard": {
+   "n": 5,
+   "p": 39900,
+   "seen": "2026-10-17"
+  },
+  "smallGlimmeringShard": {
+   "n": 8,
+   "p": 240,
+   "seen": "2026-10-20"
+  },
+  "smallGlowingShard": {
+   "n": 8,
+   "p": 1660,
+   "seen": "2026-10-20"
+  },
+  "smallRadiantShard": {
+   "n": 8,
+   "p": 74998,
+   "seen": "2026-10-20"
+  },
+  "soulDust": {
+   "n": 8,
+   "p": 596,
+   "seen": "2026-10-20"
+  },
+  "strangeDust": {
+   "n": 8,
+   "p": 62,
+   "seen": "2026-10-20"
+  },
+  "sulfuricAcid": {
+   "n": 9,
+   "p": 800,
+   "seen": "2026-10-20"
+  },
+  "sungrass": {
+   "n": 7,
+   "p": 49974,
+   "seen": "2026-10-20"
+  },
+  "truesilverBar": {
+   "n": 8,
+   "p": 2295,
+   "seen": "2026-10-20"
+  },
   "vision": {
    "n": 8,
    "p": 1995,
+   "seen": "2026-10-20"
+  },
+  "wildvine": {
+   "n": 8,
+   "p": 2024,
    "seen": "2026-10-20"
   },
   "wool": {
@@ -76,6 +281,6 @@
    "seen": "2026-10-20"
   }
  },
- "updated": "2026-11-02T11:16:02Z",
+ "updated": "2026-11-02T14:12:03Z",
  "window_days": 30
 }

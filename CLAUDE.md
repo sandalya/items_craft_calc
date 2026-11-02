@@ -4,9 +4,9 @@ Public static site (GitHub Pages: https://sandalya.github.io/items_craft_calc/).
 Sibling private repo with the addon: `C:\Users\gamai\giftLedger` (do not copy its docs here).
 
 - `index.html` — single page, data at the top of its script (`MAT`, `V`, `SECTIONS`, `BAG_ID`, `NICK`), icons in `icons/`.
-- Two tabs:
-  - **Замовлення** — bag picker (counter −/number/+ per bag), floating "Сформувати" button, result screen: "Надіслати поштою на {NICK}", summed materials, money, mail-subject code (`TA01 TA01 TA02`, repeated per bag) with copy button.
-  - **Рецепти** — the original board: per-bag materials = bag.
+- Layout: two top tabs **Замовлення / Рецепти**, and under them a profession switch **Tailoring / Enchanting** (shared between the top tabs). Four views: order-tailoring, order-enchanting, recipes-tailoring, recipes-enchanting.
+  - **Замовлення** — picker (counter −/number/+), floating "Сформувати" button, result screen: summed materials, money, mail-subject code (`TA01 TA01 TA02` / `EN01 EN07`) with copy button. Tailoring result has the red "send to {NICK}" banner; the enchanting one deliberately has none (in-game enchant flow is not designed yet).
+  - **Рецепти** — the reference board. Enchanting version has a vertical slot sidebar (Bracer, Chest, Cloak, Boots, Gloves, Shield, Weapon, 2H Weapon); wraps to rows on narrow screens.
 - `NICK` (top of the script) is the recipient name; still the placeholder "НІК" until launch.
 - Every bag is crafted one at a time (no "bags per craft" multiplier).
 - Wowhead links: icon and name link to `https://www.wowhead.com/forever/item=ID/slug`. Bag IDs are in `BAG_ID` (also name the `icons/bag_<id>.jpg` files); material IDs are the `id` field in `MAT`; Felblood Soul Bag has `id` inline in `SECTIONS` (its icon is hand-drawn). An item without `id` renders without a link. Verify an ID with `https://nether.wowhead.com/forever/tooltip/item/<id>` (returns the name).
@@ -15,3 +15,10 @@ Sibling private repo with the addon: `C:\Users\gamai\giftLedger` (do not copy it
 - Communication with the user in Ukrainian, short replies, one step at a time.
 - UI language: item and material names in English; everything else (buttons, headings, hints) in Ukrainian.
 - **Ціни аукціону:** `prices.json` (поточні) і `prices_history.json` (денні мінімуми) генерує зовнішній скрипт, не редагуй руками. Сайт читає `prices.json` через fetch; без файлу режим «Тільки голда» просто прихований. Правила в `index.html` (`MARKUP`, `MIN_DAYS`, `STALE_DAYS`, `MAX_UNIT`): матеріал іде в голду, лише якщо є ≥3 днів даних, ціна не старша за `STALE_DAYS` (норма 7; зараз тимчасово 30, бо бета закрита, див. `TEMP` у `index.html`) і ≤50г за штуку; +10% запасу.
+
+## Enchanting
+- Data: `ENCH` array in `index.html` (`s` slot, `name`, `sp` spell ID, `ic` spell icon, `rod` unused in UI, `mats`). Collected from the Wowhead suggestions API + `nether.wowhead.com/forever/tooltip/spell/<id>`; the Wowhead list pages themselves are blocked (403) for scripts. **The catalog may be incomplete or contain non-Forever entries** — verify against the Wowhead skill page (`/forever/skill=333/enchanting`).
+- Codes `EN01..` = list order; only append new enchants at the end. Spell icons: `icons/e_<iconname>.jpg`.
+- Enchant reagents were added to `MAT` (62 keys), so `update_prices.py` prices them automatically. An enchant shows a gold cost only if ALL its reagents have a price. "Тільки голда" mode works like tailoring.
+- **"Known recipes":** the page reads optional `known.json` = `{"ench":["EN01",...]}`. No file = all enchants shown. Planned: the addon exports known recipes, the price script writes `known.json`. No manual edit mode (removed on purpose).
+- The enchant markup multiplier lives outside the site (not public).
