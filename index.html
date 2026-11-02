@@ -49,7 +49,34 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ir
 .slot{flex:none;border-radius:6px;background:#0d0a08;border:2px solid #000;box-shadow:0 0 0 1px var(--iron),inset 0 0 0 1px rgba(255,255,255,.06);position:relative}
 .slot.big{width:68px;height:68px}.slot.sm{width:46px;height:46px}
 .slot svg{width:100%;height:100%;display:block}
-.slot .x2{position:absolute;right:3px;bottom:1px;font-family:var(--body);font-weight:800;font-size:16px;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000}
+.wh{color:inherit;text-decoration:none}
+.wh:hover{text-decoration:underline}
+.slot .wh{display:block;width:100%;height:100%}
+.tabs{max-width:1000px;margin:0 auto 12px;display:flex;gap:8px}
+.tab{flex:1;font-family:var(--display);font-size:20px;padding:10px;background:var(--hide);color:var(--ash);border:1px solid var(--iron);border-radius:6px;cursor:pointer}
+.tab[aria-selected=true]{background:var(--blood-deep);color:#fff4e2;border-color:var(--bronze)}
+.pick{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 14px;background:var(--hide);border:1px solid var(--iron);border-radius:4px}
+.pick.on{border-color:var(--bronze)}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:42px;height:42px;font-family:var(--display);font-size:24px;line-height:1;background:#0d0a08;color:var(--bronze);border:2px solid var(--iron);border-radius:6px;cursor:pointer}
+.qty button:disabled{opacity:.35;cursor:default}
+.qty input{width:60px;height:42px;text-align:center;font-family:var(--display);font-size:22px;background:#0d0a08;color:var(--bone);border:2px solid var(--iron);border-radius:6px;-moz-appearance:textfield;appearance:textfield}
+.qty input::-webkit-inner-spin-button,.qty input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.pick.on .qty input{border-color:var(--bronze);color:#ffd84a}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-top:1px solid var(--iron)}
+#pickList{padding-bottom:84px}
+.fab{position:fixed;z-index:10;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));box-shadow:0 4px 18px rgba(0,0,0,.7)}
+.btn{font-family:var(--display);font-size:22px;padding:12px 28px;color:#fff4e2;background:linear-gradient(180deg,var(--blood),var(--blood-deep));border:2px solid var(--bronze);border-radius:6px;cursor:pointer}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.ghost{background:var(--hide);color:var(--bronze)}
+.res{padding:6px 20px 18px}
+.res .mats{gap:14px 16px;margin:6px 0 4px}
+.res .total{display:flex;align-items:center;gap:12px;margin:8px 0}
+.res .total .money,.res .total .plus{padding-bottom:0}
+.lines{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:18px}
+.lines b{font-family:var(--display);font-weight:400;color:var(--bronze)}
+.codebox{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:6px}
+.codebox .code{margin-top:0;font-size:30px;overflow-wrap:anywhere}
 @media (max-width:760px){
   .row{grid-template-columns:1fr}
   .op{display:none}
@@ -57,7 +84,28 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ir
 }
 </style>
 
-<div class="board">
+<nav class="tabs" role="tablist">
+  <button class="tab" id="t-order" role="tab" aria-selected="true" type="button">Замовлення</button>
+  <button class="tab" id="t-recipes" role="tab" aria-selected="false" type="button">Рецепти</button>
+</nav>
+
+<div class="board" id="v-order">
+  <div id="pickView">
+    <div class="howto">Обери сумки, які тобі потрібні, і натисни <b>Сформувати</b></div>
+    <div id="pickList"></div>
+    <button class="btn fab" id="gen" type="button" disabled>Сформувати</button>
+  </div>
+  <div id="resView" hidden>
+    <header class="to">
+      <div class="lbl"><svg width="30" height="22" viewBox="0 0 30 22" aria-hidden="true"><rect x="1" y="1" width="28" height="20" rx="2" fill="#f6d9b8"/><path d="M2 3l13 10L28 3" fill="none" stroke="#5e0f0c" stroke-width="2.5"/></svg>Надіслати поштою на</div>
+      <div class="nick" id="nick2"></div>
+    </header>
+    <div class="res" id="resBody"></div>
+    <div class="bar"><button class="btn ghost" id="back" type="button">Назад</button></div>
+  </div>
+</div>
+
+<div class="board" id="v-recipes" hidden>
   <header class="to">
     <div class="lbl"><svg width="30" height="22" viewBox="0 0 30 22" aria-hidden="true"><rect x="1" y="1" width="28" height="20" rx="2" fill="#f6d9b8"/><path d="M2 3l13 10L28 3" fill="none" stroke="#5e0f0c" stroke-width="2.5"/></svg>Надіслати поштою на</div>
     <div class="nick" id="nick"></div>
@@ -73,32 +121,32 @@ const MAIL = 30; // пошта назад, мідь
 
 // Що друг надсилає натурою. kind = вид іконки, c = колір
 const MAT = {
-  linen:   {cap:"Linen Cloth",   kind:"cloth",  c:"#d9ccb0", img:"icons/linen_cloth.png"},
-  wool:    {cap:"Wool Cloth",    kind:"cloth",  c:"#b9ab90", img:"icons/wool_cloth.jpg"},
-  silk:    {cap:"Silk Cloth",    kind:"cloth",  c:"#e9d9f0"},
-  mage:    {cap:"Mageweave",     kind:"cloth",  c:"#9a7cc4"},
-  rune:    {cap:"Runecloth",     kind:"cloth",  c:"#7fa6d6"},
-  fel:     {cap:"Felcloth",      kind:"cloth",  c:"#5fb85a"},
-  moon:    {cap:"Mooncloth",     kind:"cloth",  c:"#e4f1fb"},
-  heavyL:  {cap:"Heavy Leather", kind:"leather",c:"#8a5a32"},
-  ruggedL: {cap:"Rugged Leather",kind:"leather",c:"#6b4426"},
-  enchL:   {cap:"Enchanted Leather",kind:"leather",c:"#9b6fd1"},
-  coreL:   {cap:"Core Leather",  kind:"leather",c:"#d0482c"},
+  linen:   {id:2589, cap:"Linen Cloth",   kind:"cloth",  c:"#d9ccb0", img:"icons/linen_cloth.png"},
+  wool:    {id:2592, cap:"Wool Cloth",    kind:"cloth",  c:"#b9ab90", img:"icons/wool_cloth.jpg"},
+  silk:    {id:4306, cap:"Silk Cloth",    kind:"cloth",  c:"#e9d9f0"},
+  mage:    {id:4338, cap:"Mageweave",     kind:"cloth",  c:"#9a7cc4"},
+  rune:    {id:14047, cap:"Runecloth",     kind:"cloth",  c:"#7fa6d6"},
+  fel:     {id:14256, cap:"Felcloth",      kind:"cloth",  c:"#5fb85a"},
+  moon:    {id:14342, cap:"Mooncloth",     kind:"cloth",  c:"#e4f1fb"},
+  heavyL:  {id:4234, cap:"Heavy Leather", kind:"leather",c:"#8a5a32"},
+  ruggedL: {id:8170, cap:"Rugged Leather",kind:"leather",c:"#6b4426"},
+  enchL:   {id:12810, cap:"Enchanted Leather",kind:"leather",c:"#9b6fd1"},
+  coreL:   {id:17012, cap:"Core Leather",  kind:"leather",c:"#d0482c"},
   pLeather:{cap:"Pristine Leather",kind:"leather",c:"#e6c9a2"},
   pHide:   {cap:"Pristine Hide", kind:"leather",c:"#c9b79a"},
   pScale:  {cap:"Pristine Scale",kind:"scale",  c:"#5aa6a0"},
   cerulean:{cap:"Cerulean Dye",  kind:"vial",   c:"#2f8fe0"},
   magenta: {cap:"Magenta Dye",   kind:"vial",   c:"#d63c9e"},
   viridian:{cap:"Viridian Dye",  kind:"vial",   c:"#2fb37a"},
-  ichor:   {cap:"Ichor of Undeath",kind:"vial", c:"#9fd13a"},
-  vision:  {cap:"Vision Dust",   kind:"dust",   c:"#e8d24a"},
-  gee:     {cap:"Greater Eternal Essence",kind:"crystal",c:"#f2c94c"},
-  lbs:     {cap:"Large Brilliant Shard",kind:"crystal",c:"#d8a8ff"},
-  fireE:   {cap:"Essence of Fire",kind:"orb",   c:"#ff6a2a"},
-  darkRune:{cap:"Dark Rune",     kind:"stone",  c:"#7a6a8a"},
-  ironweb: {cap:"Ironweb Spider Silk",kind:"spool",c:"#c8ccd2"},
-  pLotus:  {cap:"Purple Lotus",  kind:"herb",   c:"#a05ad0"},
-  bLotus:  {cap:"Black Lotus",   kind:"herb",   c:"#3a2a4a"},
+  ichor:   {id:7972, cap:"Ichor of Undeath",kind:"vial", c:"#9fd13a"},
+  vision:  {id:11137, cap:"Vision Dust",   kind:"dust",   c:"#e8d24a"},
+  gee:     {id:16203, cap:"Greater Eternal Essence",kind:"crystal",c:"#f2c94c"},
+  lbs:     {id:14344, cap:"Large Brilliant Shard",kind:"crystal",c:"#d8a8ff"},
+  fireE:   {id:7078, cap:"Essence of Fire",kind:"orb",   c:"#ff6a2a"},
+  darkRune:{id:20520, cap:"Dark Rune",     kind:"stone",  c:"#7a6a8a"},
+  ironweb: {id:14227, cap:"Ironweb Spider Silk",kind:"spool",c:"#c8ccd2"},
+  pLotus:  {id:8831, cap:"Purple Lotus",  kind:"herb",   c:"#a05ad0"},
+  bLotus:  {id:13468, cap:"Black Lotus",   kind:"herb",   c:"#3a2a4a"},
   morrow:  {cap:"Morrowgrain",   kind:"herb",   c:"#d9b84a"},
   blood:   {cap:"Bloodvine",     kind:"herb",   c:"#c0242a"},
 };
@@ -106,11 +154,10 @@ const MAT = {
 const V = {coarse:10, fine:100, silken:500, hSilken:2000, runeT:5000, red:50, green:100, black:1000};
 
 // e = емблема на сумці: clasp | flask (реагенти) | leaf (трави) | star (ентчант) | soul
-// out = скільки сумок за один крафт (показується бейджем)
 const SECTIONS = [
  { title:"Сумки", items:[
   {name:"Linen Bag",        note:"Сумка на 6 слотів",  c:"#c8a06a", mats:{linen:6},  v:V.coarse*3},
-  {name:"Red Linen Bag",    note:"Сумка на 8 слотів",  c:"#b23a3e", mats:{linen:8},  v:V.fine+V.red, out:2},
+  {name:"Red Linen Bag",    note:"Сумка на 8 слотів",  c:"#b23a3e", mats:{linen:8},  v:V.fine+V.red},
   {name:"Woolen Bag",       note:"Сумка на 8 слотів",  c:"#9c8c70", mats:{wool:9},   v:V.fine},
   {name:"Green Woolen Bag", note:"Сумка на 8 слотів",  c:"#4f8a3a", mats:{wool:12},  v:V.fine+V.green},
   {name:"Red Woolen Bag",   note:"Сумка на 8 слотів",  c:"#a8302e", mats:{wool:12},  v:V.fine+V.red},
@@ -124,7 +171,7 @@ const SECTIONS = [
   {name:"Bottomless Bag",   note:"Сумка на 20 слотів", c:"#4a2a6a", mats:{rune:40, moon:12, lbs:2, pScale:5, pHide:5, viridian:8}, v:V.runeT*2},
  ]},
  { title:"Реагент-сумки", items:[
-  {name:"Linen Reagent Bag",     note:"Реагент-сумка на 6 слотів",  c:"#3f8f48", e:"flask", mats:{linen:12}, v:V.coarse*6, out:2},
+  {name:"Linen Reagent Bag",     note:"Реагент-сумка на 6 слотів",  c:"#3f8f48", e:"flask", mats:{linen:12}, v:V.coarse*6},
   {name:"Woolen Reagent Bag",    note:"Реагент-сумка на 8 слотів",  c:"#3f8f48", e:"flask", mats:{wool:9, cerulean:1}, v:V.fine},
   {name:"Silk Reagent Bag",      note:"Реагент-сумка на 10 слотів", c:"#3f8f48", e:"flask", mats:{silk:12, heavyL:2, cerulean:3}, v:V.fine*3},
   {name:"Mageweave Reagent Bag", note:"Реагент-сумка на 12 слотів", c:"#3f8f48", e:"flask", mats:{mage:20, magenta:1, cerulean:1}, v:V.hSilken*2},
@@ -191,7 +238,8 @@ let _n = 0;
 // Справжні іконки з Wowhead (icons/<ключ>.jpg). Нема файлу = лишається намальована SVG.
 Object.keys(MAT).forEach(k => { if(!MAT[k].img) MAT[k].img = `icons/${k}.jpg`; });
 // item ID сумок -> icons/bag_<id>.jpg. Felblood Soul Bag не тут: його іконка збігається з Core Felcloth Bag, тому лишається намальована.
-const BAG_ID = {"Linen Bag":4238,"Red Linen Bag":5762,"Woolen Bag":4240,"Green Woolen Bag":4241,"Red Woolen Bag":5763,
+const BAG_ID = {  // = Wowhead item ID (https://www.wowhead.com/forever/item=ID). Матеріали: поле id у MAT. Нема id = без посилання
+  "Linen Bag":4238,"Red Linen Bag":5762,"Woolen Bag":4240,"Green Woolen Bag":4241,"Red Woolen Bag":5763,
   "Small Silk Pack":4245,"Green Silk Pack":5764,"Black Silk Pack":5765,"Mageweave Bag":10050,"Red Mageweave Bag":10051,
   "Runecloth Bag":14046,"Mooncloth Bag":14155,"Bottomless Bag":14156,
   // Reagent-сумки: у Forever офіційна іконка скрізь одна заглушка, тому ID тут справжні, а картинки підібрані зелені за тіром (не офіційні)
@@ -199,7 +247,7 @@ const BAG_ID = {"Linen Bag":4238,"Red Linen Bag":5762,"Woolen Bag":4240,"Green W
   "Runecloth Reagent Bag":254079,"Mooncloth Reagent Bag":254133,"Bottomless Reagent Bag":254139,
   "Enchanted Mageweave Pouch":22246,"Enchanted Runecloth Bag":22248,"Big Bag of Enchantment":22249,"Cenarion Herb Bag":22251,
   "Satchel of Cenarius":22252,"Soul Pouch":21340,"Felcloth Bag":21341,"Core Felcloth Bag":21342};
-SECTIONS.forEach(s => s.items.forEach(it => { it.code = "TA" + String(++_n).padStart(2,"0"); if(BAG_ID[it.name]) it.img = `icons/bag_${BAG_ID[it.name]}.jpg`; }));
+SECTIONS.forEach(s => s.items.forEach(it => { it.code = "TA" + String(++_n).padStart(2,"0"); it.id = BAG_ID[it.name]; if(it.id) it.img = `icons/bag_${it.id}.jpg`; }));
 const slotsNote = t => t.replace(/(\d+)\s+(слот\S*)/, '<b class="sl">$1 $2</b>');
 
 const coinSvg = f => `<svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="12" fill="${f}" stroke="#000" stroke-width="2"/><circle cx="15" cy="15" r="7" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="2"/><circle cx="11" cy="11" r="3" fill="#fff" opacity=".35"/></svg>`;
@@ -211,18 +259,88 @@ function coins(c){
   return `<span class="money">${out.join("")}</span>`;
 }
 
+const slug = n => n.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const wh = (id,name,inner) => id ? `<a class="wh" href="https://www.wowhead.com/forever/item=${id}/${slug(name)}" target="_blank" rel="noopener">${inner}</a>` : inner;
 const row = it => {
   const mats = Object.entries(it.mats).map(([k,n])=>{const m=MAT[k];return `
-    <div class="mat"><div class="top"><span class="n">${n}×</span></div><span class="slot sm">${icon(m)}</span><span class="cap">${m.cap}</span></div>`}).join("");
+    <div class="mat"><div class="top"><span class="n">${n}×</span></div><span class="slot sm">${wh(m.id,m.cap,icon(m))}</span><span class="cap">${wh(m.id,m.cap,m.cap)}</span></div>`}).join("");
   return `<div class="row">
     <div class="mats">${mats}<span class="plus">+</span>${coins(it.v+MAIL)}</div>
     <span class="op">=</span>
-    <div class="item"><span class="slot big">${it.img ? `<img src="${it.img}" alt="" style="width:100%;height:100%;display:block;border-radius:4px">` : bag(it.c,it.e)}${it.out?`<span class="x2">${it.out}</span>`:""}</span>
-      <div style="min-width:0"><div class="name">${it.name}</div><div class="note">${slotsNote(it.note)}</div><div class="code"><span class="codelbl">Код:</span> ${it.code}</div></div></div>
+    <div class="item"><span class="slot big">${wh(it.id,it.name,it.img ? `<img src="${it.img}" alt="" style="width:100%;height:100%;display:block;border-radius:4px">` : bag(it.c,it.e))}</span>
+      <div style="min-width:0"><div class="name">${wh(it.id,it.name,it.name)}</div><div class="note">${slotsNote(it.note)}</div><div class="code"><span class="codelbl">Код:</span> ${it.code}</div></div></div>
   </div>`;
 };
 
 document.getElementById("nick").textContent = NICK;
+document.getElementById("nick2").textContent = NICK;
+
+// ===================== Order tab =====================
+const $ = id => document.getElementById(id);
+const ALL = SECTIONS.flatMap(s => s.items);
+const qty = {};                                   // code -> bags wanted
+const thumb = it => it.img ? `<img src="${it.img}" alt="" style="width:100%;height:100%;display:block;border-radius:4px">` : bag(it.c,it.e);
+
+const pickRow = it => `<div class="pick" data-code="${it.code}">
+  <div class="item"><span class="slot big">${wh(it.id,it.name,thumb(it))}</span>
+    <div style="min-width:0"><div class="name">${wh(it.id,it.name,it.name)}</div><div class="note">${slotsNote(it.note)}</div></div></div>
+  <div class="qty"><button type="button" data-d="-1" aria-label="Менше" disabled>−</button><input type="number" min="0" max="999" inputmode="numeric" value="0" aria-label="${it.name}: кількість"><button type="button" data-d="1" aria-label="Більше">+</button></div>
+</div>`;
+$("pickList").innerHTML = SECTIONS.map(s => `<section><h2>${s.title}</h2><div class="rows">${s.items.map(pickRow).join("")}</div></section>`).join("");
+
+function setQty(code, v, normalize){
+  v = Math.max(0, Math.min(999, parseInt(v,10) || 0));
+  qty[code] = v;
+  const row = $("pickList").querySelector(`[data-code="${code}"]`);
+  row.classList.toggle("on", v > 0);
+  row.querySelector('[data-d="-1"]').disabled = v === 0;
+  if(normalize) row.querySelector("input").value = v;
+  const n = ALL.reduce((a,it) => a + (qty[it.code]||0), 0);
+  $("gen").textContent = n ? `Сформувати (${n})` : "Сформувати";
+  $("gen").disabled = n === 0;
+}
+$("pickList").addEventListener("click", e => {
+  const b = e.target.closest("button[data-d]"); if(!b) return;
+  const row = b.closest(".pick"), code = row.dataset.code;
+  setQty(code, (qty[code]||0) + +b.dataset.d, true);
+});
+$("pickList").addEventListener("input", e => setQty(e.target.closest(".pick").dataset.code, e.target.value, false));
+$("pickList").addEventListener("change", e => setQty(e.target.closest(".pick").dataset.code, e.target.value, true));
+
+function showResult(){
+  const chosen = ALL.filter(it => qty[it.code] > 0);
+  const tot = {}; let copper = 0;
+  chosen.forEach(it => {
+    const c = qty[it.code];
+    Object.entries(it.mats).forEach(([k,n]) => tot[k] = (tot[k]||0) + n*c);
+    copper += (it.v + MAIL) * c;
+  });
+  const mats = Object.keys(MAT).filter(k => tot[k]).map(k => `
+    <div class="mat"><div class="top"><span class="n">${tot[k]}×</span></div><span class="slot sm">${wh(MAT[k].id,MAT[k].cap,icon(MAT[k]))}</span><span class="cap">${wh(MAT[k].id,MAT[k].cap,MAT[k].cap)}</span></div>`).join("");
+  const lines = chosen.map(it => `<li><b>${wh(it.id,it.name,it.name)}</b> ×${qty[it.code]} — ${it.code}</li>`).join("");
+  const codes = chosen.flatMap(it => Array(qty[it.code]).fill(it.code)).join(" ");
+  $("resBody").innerHTML = `
+    <h2>Що надіслати</h2>
+    <div class="mats">${mats}</div>
+    ${copper ? `<div class="total"><span class="plus">+</span>${coins(copper)}</div>` : ""}
+    <h2>Тема листа</h2>
+    <div class="codebox"><div class="code"><span class="codelbl">Код:</span> <span id="codeText">${codes}</span></div><button class="btn" id="copy" type="button">Копіювати</button></div>
+    <h2>Твоє замовлення</h2>
+    <ul class="lines">${lines}</ul>`;
+  $("copy").onclick = async () => {
+    try { await navigator.clipboard.writeText(codes); $("copy").textContent = "Скопійовано"; }
+    catch { const r = document.createRange(); r.selectNodeContents($("codeText")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+  };
+  $("pickView").hidden = true; $("resView").hidden = false; scrollTo(0,0);
+}
+$("gen").onclick = showResult;
+$("back").onclick = () => { $("resView").hidden = true; $("pickView").hidden = false; scrollTo(0,0); };
+
+function tab(which){
+  $("v-order").hidden = which !== "order"; $("v-recipes").hidden = which !== "recipes";
+  $("t-order").setAttribute("aria-selected", which === "order"); $("t-recipes").setAttribute("aria-selected", which === "recipes");
+}
+$("t-order").onclick = () => tab("order"); $("t-recipes").onclick = () => tab("recipes");
 document.getElementById("sections").innerHTML = SECTIONS.map(s=>`
   <section><h2>${s.title}</h2><div class="rows">${s.items.map(row).join("")}</div></section>`).join("");
 </script>
