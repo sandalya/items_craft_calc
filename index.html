@@ -641,12 +641,17 @@ const ALL = SECTIONS.flatMap(s => s.items);
 const qty = {};                                   // code -> bags wanted
 const thumb = it => it.img ? `<img src="${it.img}" alt="" style="width:100%;height:100%;display:block;border-radius:4px">` : bag(it.c,it.e);
 
-const pickRow = it => `<div class="pick" data-code="${it.code}">
+let KNOWN_TA = null;                              // null = known.json нема (або без "ta"), показуємо все
+const isKnownTa = it => !KNOWN_TA || KNOWN_TA.has(it.code);
+const visTa = () => SECTIONS.map(s => ({...s, items: s.items.filter(isKnownTa)})).filter(s => s.items.length);
+
+const pickRow = it => `<div class="pick${qty[it.code] > 0 ? " on" : ""}" data-code="${it.code}">
   <div class="item"><span class="slot big">${wh(it.id,it.name,thumb(it))}</span>
     <div style="min-width:0"><div class="name">${wh(it.id,it.name,it.name)}</div><div class="note">${slotsNote(it.note)}</div></div></div>
-  <div class="qty"><button type="button" data-d="-1" aria-label="Менше" disabled>−</button><input type="number" min="0" max="999" inputmode="numeric" value="0" aria-label="${it.name}: кількість"><button type="button" data-d="1" aria-label="Більше">+</button></div>
+  <div class="qty"><button type="button" data-d="-1" aria-label="Менше" ${qty[it.code] > 0 ? "" : "disabled"}>−</button><input type="number" min="0" max="999" inputmode="numeric" value="${qty[it.code] || 0}" aria-label="${it.name}: кількість"><button type="button" data-d="1" aria-label="Більше">+</button></div>
 </div>`;
-$("pickList").innerHTML = SECTIONS.map(s => `<section><h2>${s.title}</h2><div class="rows">${s.items.map(pickRow).join("")}</div></section>`).join("");
+const renderTaPick = () => { $("pickList").innerHTML = visTa().map(s => `<section><h2>${s.title}</h2><div class="rows">${s.items.map(pickRow).join("")}</div></section>`).join(""); };
+renderTaPick();
 
 function setQty(code, v, normalize){
   v = Math.max(0, Math.min(999, parseInt(v,10) || 0));
@@ -655,6 +660,9 @@ function setQty(code, v, normalize){
   row.classList.toggle("on", v > 0);
   row.querySelector('[data-d="-1"]').disabled = v === 0;
   if(normalize) row.querySelector("input").value = v;
+  updGen();
+}
+function updGen(){
   const n = ALL.reduce((a,it) => a + (qty[it.code]||0), 0);
   $("gen").textContent = n ? `Сформувати (${n})` : "Сформувати";
   $("gen").disabled = n === 0;
@@ -743,14 +751,22 @@ function go(){
 }
 $("t-order").onclick = () => { TOP = "order"; go(); }; $("t-recipes").onclick = () => { TOP = "recipes"; go(); };
 $("s-ta").onclick = () => { SUB = "ta"; go(); }; $("s-en").onclick = () => { SUB = "en"; go(); };
-document.getElementById("sections").innerHTML = SECTIONS.map(s=>`
-  <section><h2>${s.title}</h2><div class="rows">${s.items.map(row).join("")}</div></section>`).join("");
+const renderTaRec = () => { document.getElementById("sections").innerHTML = visTa().map(s=>`
+  <section><h2>${s.title}</h2><div class="rows">${s.items.map(row).join("")}</div></section>`).join(""); };
+renderTaRec();
 
 // ===================== Енчантинг =====================
 ENCH.forEach((e,i) => e.code = "EN" + String(i+1).padStart(2,"0"));
 const SLOTS = [...new Set(ENCH.map(e => e.s))];
 let KNOWN = null;                                                // null = known.json нема, показуємо все
-fetch("known.json", {cache:"no-store"}).then(r => r.ok ? r.json() : null).then(j => { if(j && Array.isArray(j.ench)){ KNOWN = new Set(j.ench); renderEnch(); } }).catch(() => {});
+fetch("known.json", {cache:"no-store"}).then(r => r.ok ? r.json() : null).then(j => {
+  if(j && Array.isArray(j.ench)){ KNOWN = new Set(j.ench); renderEnch(); }
+  if(j && Array.isArray(j.ta)){
+    KNOWN_TA = new Set(j.ta);
+    ALL.forEach(it => { if(!isKnownTa(it)) qty[it.code] = 0; });   // невідомий рецепт не може лишитись у замовленні
+    renderTaPick(); renderTaRec(); updGen();
+  }
+}).catch(() => {});
 const isKnown = e => !KNOWN || KNOWN.has(e.code);   // known.json з аддона; нема файлу = показуємо все
 const qtyE = {};
 let enSlot = SLOTS[0];
