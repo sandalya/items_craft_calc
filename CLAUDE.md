@@ -14,3 +14,4 @@ Sibling private repo with the addon: `C:\Users\gamai\giftLedger` (do not copy it
 - Commits use the GitHub noreply email (already set in local git config). Never commit personal data.
 - Communication with the user in Ukrainian, short replies, one step at a time.
 - UI language: item and material names in English; everything else (buttons, headings, hints) in Ukrainian.
+- **Ціни аукціону:** `prices.json` (поточні) і `prices_history.json` (денні мінімуми) генерує зовнішній скрипт, не редагуй руками. Сайт читає `prices.json` через fetch; без файлу режим «Тільки голда» просто прихований. Правила в `index.html` (`MARKUP`, `MIN_DAYS`, `STALE_DAYS`, `MAX_UNIT`): матеріал іде в голду, лише якщо є ≥3 днів даних, ціна не старша за 7 днів і ≤50г за штуку; +10% запасу.

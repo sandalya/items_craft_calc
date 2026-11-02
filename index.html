@@ -75,6 +75,13 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ir
 .res .total .money,.res .total .plus{padding-bottom:0}
 .lines{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:18px}
 .lines b{font-family:var(--display);font-weight:400;color:var(--bronze)}
+.seg{display:flex;gap:0;margin:10px 0 4px;border:2px solid var(--iron);border-radius:6px;overflow:hidden}
+.seg button{flex:1;font-family:var(--display);font-size:18px;padding:10px 8px;background:var(--hide);color:var(--ash);border:0;cursor:pointer}
+.seg button+button{border-left:2px solid var(--iron)}
+.seg button[aria-pressed=true]{background:var(--blood-deep);color:#fff4e2}
+.pricenote{margin:10px 0 6px;font-size:16px;color:var(--ash)}
+.lines.paid li{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.lines.paid .coin{font-size:18px}.lines.paid .coin svg{width:16px;height:16px}.lines.paid .money{padding-bottom:0;gap:6px}
 .codebox{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:6px}
 .codebox .code{margin-top:0;font-size:30px;overflow-wrap:anywhere}
 @media (max-width:760px){
@@ -307,7 +314,25 @@ $("pickList").addEventListener("click", e => {
 $("pickList").addEventListener("input", e => setQty(e.target.closest(".pick").dataset.code, e.target.value, false));
 $("pickList").addEventListener("change", e => setQty(e.target.closest(".pick").dataset.code, e.target.value, true));
 
-function showResult(){
+// ---- Ціни аукціону (prices.json робить tools/update_prices.py) ----
+const MARKUP = 1.10;       // запас на зміну цін, поки я купую
+const MIN_DAYS = 3;        // мінімум днів даних у вікні, інакше ціна ненадійна
+const STALE_DAYS = 7;      // старіша за стільки днів ціна ігнорується
+const MAX_UNIT = 500000;   // дорожче за 50г за штуку — лишається натурою (мідь)
+let PRICES = null;
+fetch("prices.json", {cache:"no-store"}).then(r => r.ok ? r.json() : null).then(j => { PRICES = j; }).catch(() => {});
+// мідь за 1 штуку з запасом, або 0 якщо цінам не можна вірити
+function unit(k){
+  const i = PRICES && PRICES.items && PRICES.items[k];
+  if(!i || i.n < MIN_DAYS || i.p > MAX_UNIT) return 0;
+  if((Date.now() - Date.parse(i.seen)) / 864e5 > STALE_DAYS) return 0;
+  return Math.ceil(i.p * MARKUP);
+}
+const fmtDate = s => { const d = new Date(s); return d.toLocaleDateString("uk-UA", {day:"numeric", month:"long"}); };
+
+let mode = "mats";
+function showResult(m){
+  mode = m || "mats";
   const chosen = ALL.filter(it => qty[it.code] > 0);
   const tot = {}; let copper = 0;
   chosen.forEach(it => {
@@ -315,14 +340,32 @@ function showResult(){
     Object.entries(it.mats).forEach(([k,n]) => tot[k] = (tot[k]||0) + n*c);
     copper += (it.v + MAIL) * c;
   });
-  const mats = Object.keys(MAT).filter(k => tot[k]).map(k => `
+  const canGold = Object.keys(tot).some(unit);
+  if(!canGold) mode = "mats";
+  const gold = mode === "gold";
+  let paid = "", lastSeen = "";
+  if(gold){
+    let matCopper = 0;
+    paid = Object.keys(MAT).filter(k => tot[k] && unit(k)).map(k => {
+      const c = tot[k] * unit(k); matCopper += c;
+      if(PRICES.items[k].seen > lastSeen) lastSeen = PRICES.items[k].seen;
+      return `<li><b>${wh(MAT[k].id,MAT[k].cap,MAT[k].cap)}</b> ×${tot[k]} — ${coins(c)}</li>`;
+    }).join("");
+    copper = Math.ceil((copper + matCopper) / 100) * 100;
+  }
+  const mats = Object.keys(MAT).filter(k => tot[k] && !(gold && unit(k))).map(k => `
     <div class="mat"><div class="top"><span class="n">${tot[k]}×</span></div><span class="slot sm">${wh(MAT[k].id,MAT[k].cap,icon(MAT[k]))}</span><span class="cap">${wh(MAT[k].id,MAT[k].cap,MAT[k].cap)}</span></div>`).join("");
   const lines = chosen.map(it => `<li><b>${wh(it.id,it.name,it.name)}</b> ×${qty[it.code]} — ${it.code}</li>`).join("");
   const codes = chosen.flatMap(it => Array(qty[it.code]).fill(it.code)).join(" ");
   $("resBody").innerHTML = `
+    ${canGold ? `<div class="seg" role="group" aria-label="Спосіб оплати">
+      <button type="button" data-m="mats" aria-pressed="${!gold}">Матеріали + голда</button>
+      <button type="button" data-m="gold" aria-pressed="${gold}">Тільки голда</button></div>` : ""}
     <h2>Що надіслати</h2>
-    <div class="mats">${mats}</div>
-    ${copper ? `<div class="total"><span class="plus">+</span>${coins(copper)}</div>` : ""}
+    ${mats ? `<div class="mats">${mats}</div>` : ""}
+    ${copper ? `<div class="total">${mats ? '<span class="plus">+</span>' : ""}${coins(copper)}</div>` : ""}
+    ${gold ? `<div class="pricenote">Матеріали куплю я на аукціоні. Ціни від ${fmtDate(lastSeen)}, з запасом ${Math.round((MARKUP-1)*100)}%. Те, чого нема на аукціоні або що надто дороге, лишається матеріалами.</div>
+    <ul class="lines paid">${paid}</ul>` : ""}
     <h2>Тема листа</h2>
     <div class="codebox"><div class="code"><span class="codelbl">Код:</span> <span id="codeText">${codes}</span></div><button class="btn" id="copy" type="button">Копіювати</button></div>
     <h2>Твоє замовлення</h2>
@@ -331,9 +374,11 @@ function showResult(){
     try { await navigator.clipboard.writeText(codes); $("copy").textContent = "Скопійовано"; }
     catch { const r = document.createRange(); r.selectNodeContents($("codeText")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
   };
-  $("pickView").hidden = true; $("resView").hidden = false; scrollTo(0,0);
+  document.querySelectorAll(".seg button").forEach(b => b.onclick = () => { showResult(b.dataset.m); });
+  $("pickView").hidden = true; $("resView").hidden = false;
+  if(!m) scrollTo(0,0);
 }
-$("gen").onclick = showResult;
+$("gen").onclick = () => showResult("mats");
 $("back").onclick = () => { $("resView").hidden = true; $("pickView").hidden = false; scrollTo(0,0); };
 
 function tab(which){
