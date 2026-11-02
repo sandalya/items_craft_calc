@@ -1,0 +1,230 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Кравецька Майстерня</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kelly+Slab&family=Alegreya+Sans:wght@700;800&display=swap">
+<style>
+/* Layout: one screenshot-ready board — huge "send to" nick on a red banner, then icon equations: mats + coins = item */
+:root{
+  --ground:#16110e; --hide:#2a1f18; --iron:#5b4b3e;
+  --blood:#9e1b16; --blood-deep:#5e0f0c; --bronze:#c99a4b;
+  --bone:#eadfca; --ash:#a8988a; --note:#7fd36b;
+  --gold:#e3b23c; --silver:#c9ced6; --copper:#d07a3e;
+  --display:"Kelly Slab","Rockwell",Georgia,serif;
+  --body:"Alegreya Sans","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--bone);font-family:var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px}
+.board{max-width:1000px;margin:0 auto;background:radial-gradient(900px 400px at 50% 0,rgba(158,27,22,.18),transparent 70%),#1c1511;border:1px solid var(--iron);border-radius:6px;overflow:hidden}
+
+.to{background:linear-gradient(180deg,var(--blood),var(--blood-deep));border-bottom:4px solid var(--bronze);padding:22px 24px 26px;text-align:center}
+.to .lbl{font-family:var(--display);font-size:22px;color:#f6d9b8;display:flex;align-items:center;justify-content:center;gap:10px}
+.to .nick{display:inline-block;margin-top:10px;font-family:var(--display);font-size:clamp(40px,9vw,72px);line-height:1;color:#fff4e2;
+  padding:12px 28px;border:3px dashed rgba(255,244,226,.55);border-radius:6px;background:rgba(0,0,0,.25);letter-spacing:.03em;max-width:100%;overflow-wrap:anywhere}
+
+section{padding:6px 20px 18px}
+h2{font-family:var(--display);font-weight:400;font-size:26px;color:var(--bronze);margin:16px 0 10px;display:flex;align-items:center;gap:12px}
+h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--iron),transparent)}
+.rows{display:grid;gap:10px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto 280px;align-items:center;gap:12px 16px;padding:12px 16px;background:var(--hide);border:1px solid var(--iron);border-radius:4px}
+.mats{display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px 12px;min-width:0}
+.mat{display:flex;flex-direction:column;align-items:center;gap:4px;width:74px}
+.mat .top{display:flex;align-items:center;gap:4px}
+.mat .n{font-family:var(--display);font-size:24px;color:#ffd84a;line-height:1;font-variant-numeric:tabular-nums}
+.mat .cap{font-size:12px;line-height:1.15;text-align:center;color:var(--ash);font-weight:700}
+.plus{font-family:var(--display);font-size:30px;color:var(--bronze);align-self:center;padding-bottom:16px}
+.op{font-family:var(--display);font-size:40px;color:var(--bronze);line-height:1}
+.money{display:flex;align-items:center;gap:10px;align-self:center;padding-bottom:16px}
+.coin{display:flex;align-items:center;gap:5px;font-family:var(--display);font-size:30px;line-height:1}
+.coin svg{width:26px;height:26px}
+.item{display:flex;align-items:center;gap:12px;min-width:0}
+.name{font-family:var(--display);font-size:22px;line-height:1.1}
+.note{margin-top:4px;font-weight:700;font-size:17px;color:var(--ash)}
+.note .sl{font-family:var(--display);font-weight:400;font-size:24px;color:var(--note)}
+.code{margin-top:8px;display:inline-flex;align-items:center;gap:8px;font-family:var(--display);font-size:28px;line-height:1;letter-spacing:.06em;color:#1a0f08;background:var(--bronze);padding:6px 14px;border-radius:5px;border:2px solid #000}
+.code .codelbl{font-family:var(--body);font-weight:800;font-size:15px;letter-spacing:0;text-transform:uppercase;opacity:.75}
+.howto{margin:14px 20px 0;padding:12px 16px;background:var(--hide);border:1px dashed var(--bronze);border-radius:4px;font-size:18px;text-align:center}
+.howto b{font-family:var(--display);font-weight:400;color:var(--bronze);font-size:22px;letter-spacing:.05em}
+.slot{flex:none;border-radius:6px;background:#0d0a08;border:2px solid #000;box-shadow:0 0 0 1px var(--iron),inset 0 0 0 1px rgba(255,255,255,.06);position:relative}
+.slot.big{width:68px;height:68px}.slot.sm{width:46px;height:46px}
+.slot svg{width:100%;height:100%;display:block}
+.slot .x2{position:absolute;right:3px;bottom:1px;font-family:var(--body);font-weight:800;font-size:16px;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000}
+@media (max-width:760px){
+  .row{grid-template-columns:1fr}
+  .op{display:none}
+  .item{order:-1;padding-bottom:8px;border-bottom:1px solid var(--iron)}
+}
+</style>
+
+<div class="board">
+  <header class="to">
+    <div class="lbl"><svg width="30" height="22" viewBox="0 0 30 22" aria-hidden="true"><rect x="1" y="1" width="28" height="20" rx="2" fill="#f6d9b8"/><path d="M2 3l13 10L28 3" fill="none" stroke="#5e0f0c" stroke-width="2.5"/></svg>Надіслати поштою на</div>
+    <div class="nick" id="nick"></div>
+  </header>
+  <div class="howto">У темі листа напиши <b>код</b> сумки, можна кілька: <b>TA01 TA03</b>. Більше копій — повтори код: <b>TA01 TA01</b></div>
+  <div id="sections"></div>
+</div>
+
+<script>
+// ===================== ДАНІ: міняй тут =====================
+const NICK = "НІК";
+const MAIL = 30; // пошта назад, мідь
+
+// Що друг надсилає натурою. kind = вид іконки, c = колір
+const MAT = {
+  linen:   {cap:"Linen Cloth",   kind:"cloth",  c:"#d9ccb0", img:"icons/linen_cloth.png"},
+  wool:    {cap:"Wool Cloth",    kind:"cloth",  c:"#b9ab90", img:"icons/wool_cloth.jpg"},
+  silk:    {cap:"Silk Cloth",    kind:"cloth",  c:"#e9d9f0"},
+  mage:    {cap:"Mageweave",     kind:"cloth",  c:"#9a7cc4"},
+  rune:    {cap:"Runecloth",     kind:"cloth",  c:"#7fa6d6"},
+  fel:     {cap:"Felcloth",      kind:"cloth",  c:"#5fb85a"},
+  moon:    {cap:"Mooncloth",     kind:"cloth",  c:"#e4f1fb"},
+  heavyL:  {cap:"Heavy Leather", kind:"leather",c:"#8a5a32"},
+  ruggedL: {cap:"Rugged Leather",kind:"leather",c:"#6b4426"},
+  enchL:   {cap:"Enchanted Leather",kind:"leather",c:"#9b6fd1"},
+  coreL:   {cap:"Core Leather",  kind:"leather",c:"#d0482c"},
+  pLeather:{cap:"Pristine Leather",kind:"leather",c:"#e6c9a2"},
+  pHide:   {cap:"Pristine Hide", kind:"leather",c:"#c9b79a"},
+  pScale:  {cap:"Pristine Scale",kind:"scale",  c:"#5aa6a0"},
+  cerulean:{cap:"Cerulean Dye",  kind:"vial",   c:"#2f8fe0"},
+  magenta: {cap:"Magenta Dye",   kind:"vial",   c:"#d63c9e"},
+  viridian:{cap:"Viridian Dye",  kind:"vial",   c:"#2fb37a"},
+  ichor:   {cap:"Ichor of Undeath",kind:"vial", c:"#9fd13a"},
+  vision:  {cap:"Vision Dust",   kind:"dust",   c:"#e8d24a"},
+  gee:     {cap:"Greater Eternal Essence",kind:"crystal",c:"#f2c94c"},
+  lbs:     {cap:"Large Brilliant Shard",kind:"crystal",c:"#d8a8ff"},
+  fireE:   {cap:"Essence of Fire",kind:"orb",   c:"#ff6a2a"},
+  darkRune:{cap:"Dark Rune",     kind:"stone",  c:"#7a6a8a"},
+  ironweb: {cap:"Ironweb Spider Silk",kind:"spool",c:"#c8ccd2"},
+  pLotus:  {cap:"Purple Lotus",  kind:"herb",   c:"#a05ad0"},
+  bLotus:  {cap:"Black Lotus",   kind:"herb",   c:"#3a2a4a"},
+  morrow:  {cap:"Morrowgrain",   kind:"herb",   c:"#d9b84a"},
+  blood:   {cap:"Bloodvine",     kind:"herb",   c:"#c0242a"},
+};
+// Вендор (мідь): нитки і фарби купую я
+const V = {coarse:10, fine:100, silken:500, hSilken:2000, runeT:5000, red:50, green:100, black:1000};
+
+// e = емблема на сумці: clasp | flask (реагенти) | leaf (трави) | star (ентчант) | soul
+// out = скільки сумок за один крафт (показується бейджем)
+const SECTIONS = [
+ { title:"Сумки", items:[
+  {name:"Linen Bag",        note:"Сумка на 6 слотів",  c:"#c8a06a", mats:{linen:6},  v:V.coarse*3},
+  {name:"Red Linen Bag",    note:"Сумка на 8 слотів",  c:"#b23a3e", mats:{linen:8},  v:V.fine+V.red, out:2},
+  {name:"Woolen Bag",       note:"Сумка на 8 слотів",  c:"#9c8c70", mats:{wool:9},   v:V.fine},
+  {name:"Green Woolen Bag", note:"Сумка на 8 слотів",  c:"#4f8a3a", mats:{wool:12},  v:V.fine+V.green},
+  {name:"Red Woolen Bag",   note:"Сумка на 8 слотів",  c:"#a8302e", mats:{wool:12},  v:V.fine+V.red},
+  {name:"Small Silk Pack",  note:"Сумка на 10 слотів", c:"#d8c6e2", mats:{silk:12, heavyL:2}, v:V.fine*3},
+  {name:"Green Silk Pack",  note:"Сумка на 10 слотів", c:"#5aa04a", mats:{silk:16, heavyL:3}, v:V.fine*3+V.green},
+  {name:"Black Silk Pack",  note:"Сумка на 10 слотів", c:"#3a3340", mats:{silk:20}, v:V.fine*4+V.black},
+  {name:"Mageweave Bag",    note:"Сумка на 12 слотів", c:"#8a6cb8", mats:{mage:20}, v:V.silken*2},
+  {name:"Red Mageweave Bag",note:"Сумка на 12 слотів", c:"#b8323a", mats:{mage:20}, v:V.red*2+V.hSilken*2},
+  {name:"Runecloth Bag",    note:"Сумка на 14 слотів", c:"#5f86c0", mats:{rune:25, ruggedL:2, magenta:4, cerulean:2}, v:V.runeT},
+  {name:"Mooncloth Bag",    note:"Сумка на 18 слотів", c:"#dfeaf5", mats:{rune:20, moon:1, viridian:10, magenta:2, cerulean:4}, v:V.runeT},
+  {name:"Bottomless Bag",   note:"Сумка на 20 слотів", c:"#4a2a6a", mats:{rune:40, moon:12, lbs:2, pScale:5, pHide:5, viridian:8}, v:V.runeT*2},
+ ]},
+ { title:"Реагент-сумки", items:[
+  {name:"Linen Reagent Bag",     note:"Реагент-сумка на 6 слотів",  c:"#3f8f48", e:"flask", mats:{linen:12}, v:V.coarse*6, out:2},
+  {name:"Woolen Reagent Bag",    note:"Реагент-сумка на 8 слотів",  c:"#3f8f48", e:"flask", mats:{wool:9, cerulean:1}, v:V.fine},
+  {name:"Silk Reagent Bag",      note:"Реагент-сумка на 10 слотів", c:"#3f8f48", e:"flask", mats:{silk:12, heavyL:2, cerulean:3}, v:V.fine*3},
+  {name:"Mageweave Reagent Bag", note:"Реагент-сумка на 12 слотів", c:"#3f8f48", e:"flask", mats:{mage:20, magenta:1, cerulean:1}, v:V.hSilken*2},
+  {name:"Runecloth Reagent Bag", note:"Реагент-сумка на 14 слотів", c:"#3f8f48", e:"flask", mats:{rune:25, ruggedL:2, viridian:1}, v:V.runeT},
+  {name:"Mooncloth Reagent Bag", note:"Реагент-сумка на 18 слотів", c:"#3f8f48", e:"flask", mats:{rune:20, moon:1, viridian:10, magenta:1, cerulean:1}, v:V.runeT},
+  {name:"Bottomless Reagent Bag",note:"Реагент-сумка на 20 слотів", c:"#2f6a38", e:"flask", mats:{rune:40, moon:12, lbs:2, pLeather:5, pHide:5, pScale:5}, v:V.runeT*2},
+ ]},
+ { title:"Спецсумки", items:[
+  {name:"Enchanted Mageweave Pouch", note:"Ентчант-сумка на 20 слотів", c:"#7a52b8", e:"star", mats:{mage:20, vision:4}, v:V.hSilken*2},
+  {name:"Enchanted Runecloth Bag",   note:"Ентчант-сумка на 26 слотів", c:"#5a6cc8", e:"star", mats:{rune:25, gee:2}, v:V.runeT*2},
+  {name:"Big Bag of Enchantment",    note:"Ентчант-сумка на 32 слоти",  c:"#8a3ac8", e:"star", mats:{rune:30, lbs:4, enchL:4, ironweb:4}, v:0},
+  {name:"Cenarion Herb Bag",         note:"Сумка для трав на 26 слотів",c:"#4f8a3a", e:"leaf", mats:{rune:25, pLotus:10, morrow:8}, v:V.runeT*2},
+  {name:"Satchel of Cenarius",       note:"Сумка для трав на 32 слоти", c:"#2f7a3a", e:"leaf", mats:{rune:30, moon:2, bLotus:1, ironweb:4}, v:0},
+  {name:"Soul Pouch",                note:"Сумка для шардів на 24 слоти",c:"#5a2a6a", e:"soul", mats:{rune:30, ruggedL:4, ichor:2}, v:V.runeT},
+  {name:"Felcloth Bag",              note:"Сумка для шардів на 32 слоти",c:"#3a7a3a", e:"soul", mats:{fel:12, enchL:6, darkRune:2, ironweb:4}, v:0},
+  {name:"Felblood Soul Bag",         note:"Сумка для шардів на 30 слотів",c:"#6a1a2a", e:"soul", mats:{fel:8, rune:30}, v:0},
+  {name:"Core Felcloth Bag",         note:"Сумка для шардів на 28 слотів",c:"#b8321a", e:"soul", mats:{fel:20, coreL:16, blood:8, fireE:4, ironweb:4}, v:0},
+ ]},
+];
+// ===========================================================
+
+const K = "#1a0f08";
+const emblem = e => ({
+  clasp:`<circle cx="36" cy="34" r="6.5" fill="#e8c35a" stroke="#4a3210" stroke-width="2"/><circle cx="34" cy="32" r="2" fill="#fff6c8"/>`,
+  flask:`<path d="M33 27h6v5l5 9q1 4-3 4h-10q-4 0-3-4l5-9z" fill="#f2f2e6" stroke="${K}" stroke-width="2"/><path d="M30 39h12l1 3q0 2-2 2H31q-2 0-2-2z" fill="#7ad85a"/>`,
+  leaf:`<path d="M28 42q0-14 16-16q0 15-16 16z" fill="#8fd65a" stroke="${K}" stroke-width="2"/><path d="M29 41l12-12" stroke="${K}" stroke-width="1.5"/>`,
+  star:`<path d="M36 25l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#ffe36a" stroke="${K}" stroke-width="1.8"/>`,
+  soul:`<path d="M36 25q8 7 4 14q-2 4-4 5q-2-1-4-5q-4-7 4-14z" fill="#c070ff" stroke="${K}" stroke-width="2"/><circle cx="36" cy="38" r="2.5" fill="#fff"/>`,
+}[e||"clasp"]);
+
+const bag = (c,e) => `<svg viewBox="0 0 72 72" aria-hidden="true">
+  <rect width="72" height="72" fill="${c}" opacity=".18"/>
+  <path d="M14 30 Q14 22 22 21 L50 21 Q58 22 58 30 L56 56 Q55 62 48 62 L24 62 Q17 62 16 56 Z" fill="${c}" stroke="${K}" stroke-width="2.5"/>
+  <path d="M16 31 Q36 42 56 31 L57 24 Q36 30 15 24 Z" fill="#000" opacity=".22"/>
+  <path d="M15 24 Q36 32 57 24" fill="none" stroke="${K}" stroke-width="2"/>
+  <path d="M22 21 Q36 10 50 21" fill="none" stroke="${K}" stroke-width="4"/>
+  <path d="M22 21 Q36 10 50 21" fill="none" stroke="${c}" stroke-width="1.6"/>
+  ${emblem(e)}
+  <path d="M20 52 Q36 58 52 52" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="3 3" opacity=".45"/>
+  <path d="M19 28 Q20 40 22 54" fill="none" stroke="#fff" stroke-width="2" opacity=".2"/>
+</svg>`;
+
+const ICON = {
+  cloth:c=>`<rect width="72" height="72" fill="#2e2620"/><g transform="rotate(-12 36 36)"><rect x="8" y="10" width="56" height="52" rx="3" fill="${c}" stroke="${K}" stroke-width="2"/>
+    ${[18,26,34,42,50,58].map(x=>`<path d="M${x} 11V61" stroke="#000" stroke-opacity=".22" stroke-width="3"/>`).join("")}
+    ${[18,26,34,42,50].map(y=>`<path d="M9 ${y}H63" stroke="#fff" stroke-opacity=".45" stroke-width="2.4"/>`).join("")}
+    <path d="M8 62l6 6M20 62l4 7M32 62l2 7M46 62l-1 7M58 62l-3 7" stroke="${c}" stroke-width="2"/></g>`,
+  leather:c=>`<rect width="72" height="72" fill="#2e2620"/><path d="M14 16q8 4 12-2q10 4 20 0q4 6 12 2q-2 10 2 16q-6 6-2 16q-8-2-12 6q-10-4-20 0q-4-8-12-6q4-10-2-16q4-6 2-16z" fill="${c}" stroke="${K}" stroke-width="2.5"/><path d="M26 30q10 6 20 0M24 42q12 6 24 0" stroke="#000" stroke-opacity=".25" stroke-width="2" fill="none"/>`,
+  scale:c=>`<rect width="72" height="72" fill="#2e2620"/>${[[22,26],[44,26],[33,40],[22,54],[44,54]].map(([x,y])=>`<path d="M${x-12} ${y}q12-16 24 0q-12 12-24 0z" fill="${c}" stroke="${K}" stroke-width="2"/>`).join("")}`,
+  vial:c=>`<rect width="72" height="72" fill="#2e2620"/><path d="M30 10h12v6h-2v12l12 20q3 10-8 12H28q-11-2-8-12l12-20V16h-2z" fill="#e8eef0" fill-opacity=".85" stroke="${K}" stroke-width="2.5"/><path d="M24 46h24l3 4q2 7-7 8H28q-9-1-7-8z" fill="${c}"/><rect x="30" y="6" width="12" height="6" rx="1" fill="#8a5a32" stroke="${K}" stroke-width="2"/>`,
+  dust:c=>`<rect width="72" height="72" fill="#2e2620"/><path d="M14 56q22-26 44 0z" fill="${c}" stroke="${K}" stroke-width="2"/>${[[24,30],[40,22],[50,36],[30,42],[46,48]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3" fill="${c}"/>`).join("")}`,
+  crystal:c=>`<rect width="72" height="72" fill="#2e2620"/><path d="M36 8l16 20-16 36-16-36z" fill="${c}" stroke="${K}" stroke-width="2.5"/><path d="M20 28h32M36 8v56" stroke="#fff" stroke-opacity=".45" stroke-width="2"/>`,
+  orb:c=>`<rect width="72" height="72" fill="#2e2620"/><circle cx="36" cy="38" r="20" fill="${c}" stroke="${K}" stroke-width="2.5"/><path d="M36 22q10 10 0 22q-8-8 0-22z" fill="#ffe08a"/><circle cx="29" cy="31" r="4" fill="#fff" opacity=".5"/>`,
+  stone:c=>`<rect width="72" height="72" fill="#2e2620"/><path d="M18 20l20-8 18 12-2 28-20 10-16-14z" fill="${c}" stroke="${K}" stroke-width="2.5"/><path d="M30 28l10 6-6 10 10 6" stroke="#c8a0ff" stroke-width="3" fill="none"/>`,
+  spool:c=>`<rect width="72" height="72" fill="#2e2620"/><rect x="16" y="12" width="40" height="8" rx="2" fill="#8a5a32" stroke="${K}" stroke-width="2"/><rect x="16" y="52" width="40" height="8" rx="2" fill="#8a5a32" stroke="${K}" stroke-width="2"/><rect x="20" y="20" width="32" height="32" fill="${c}" stroke="${K}" stroke-width="2"/>${[25,30,35,40,45].map(y=>`<path d="M20 ${y}h32" stroke="#000" stroke-opacity=".25"/>`).join("")}`,
+  herb:c=>`<rect width="72" height="72" fill="#2e2620"/><path d="M36 64V30" stroke="#4f8a3a" stroke-width="4"/><path d="M36 50q-14-2-16-14q14 0 16 14zM36 44q14-2 16-14q-14 0-16 14z" fill="#5aa04a" stroke="${K}" stroke-width="2"/>${[0,72,144,216,288].map(a=>`<ellipse cx="36" cy="18" rx="5" ry="9" fill="${c}" stroke="${K}" stroke-width="1.5" transform="rotate(${a} 36 26)"/>`).join("")}<circle cx="36" cy="26" r="4" fill="#ffe36a"/>`,
+};
+const icon = m => m.img
+  ? `<img src="${m.img}" alt="" style="width:100%;height:100%;display:block;border-radius:4px">`
+  : `<svg viewBox="0 0 72 72" aria-hidden="true">${ICON[m.kind](m.c)}</svg>`;
+
+// Коди рецептів: TA + номер за порядком у списку. УВАГА: коди постійні — нові сумки додавай ТІЛЬКИ в кінець останньої секції, нічого не вставляй всередину.
+let _n = 0;
+// Справжні іконки з Wowhead (icons/<ключ>.jpg). Нема файлу = лишається намальована SVG.
+Object.keys(MAT).forEach(k => { if(!MAT[k].img) MAT[k].img = `icons/${k}.jpg`; });
+// item ID сумок -> icons/bag_<id>.jpg. Felblood Soul Bag не тут: його іконка збігається з Core Felcloth Bag, тому лишається намальована.
+const BAG_ID = {"Linen Bag":4238,"Red Linen Bag":5762,"Woolen Bag":4240,"Green Woolen Bag":4241,"Red Woolen Bag":5763,
+  "Small Silk Pack":4245,"Green Silk Pack":5764,"Black Silk Pack":5765,"Mageweave Bag":10050,"Red Mageweave Bag":10051,
+  "Runecloth Bag":14046,"Mooncloth Bag":14155,"Bottomless Bag":14156,
+  // Reagent-сумки: у Forever офіційна іконка скрізь одна заглушка, тому ID тут справжні, а картинки підібрані зелені за тіром (не офіційні)
+  "Linen Reagent Bag":253664,"Woolen Reagent Bag":253667,"Silk Reagent Bag":253973,"Mageweave Reagent Bag":254035,
+  "Runecloth Reagent Bag":254079,"Mooncloth Reagent Bag":254133,"Bottomless Reagent Bag":254139,
+  "Enchanted Mageweave Pouch":22246,"Enchanted Runecloth Bag":22248,"Big Bag of Enchantment":22249,"Cenarion Herb Bag":22251,
+  "Satchel of Cenarius":22252,"Soul Pouch":21340,"Felcloth Bag":21341,"Core Felcloth Bag":21342};
+SECTIONS.forEach(s => s.items.forEach(it => { it.code = "TA" + String(++_n).padStart(2,"0"); if(BAG_ID[it.name]) it.img = `icons/bag_${BAG_ID[it.name]}.jpg`; }));
+const slotsNote = t => t.replace(/(\d+)\s+(слот\S*)/, '<b class="sl">$1 $2</b>');
+
+const coinSvg = f => `<svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="12" fill="${f}" stroke="#000" stroke-width="2"/><circle cx="15" cy="15" r="7" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="2"/><circle cx="11" cy="11" r="3" fill="#fff" opacity=".35"/></svg>`;
+function coins(c){
+  const g=Math.floor(c/10000), s=Math.floor(c%10000/100), cp=c%100, out=[];
+  if(g) out.push(`<span class="coin">${g}${coinSvg("var(--gold)")}</span>`);
+  if(s) out.push(`<span class="coin">${s}${coinSvg("var(--silver)")}</span>`);
+  if(cp||!out.length) out.push(`<span class="coin">${cp}${coinSvg("var(--copper)")}</span>`);
+  return `<span class="money">${out.join("")}</span>`;
+}
+
+const row = it => {
+  const mats = Object.entries(it.mats).map(([k,n])=>{const m=MAT[k];return `
+    <div class="mat"><div class="top"><span class="n">${n}×</span></div><span class="slot sm">${icon(m)}</span><span class="cap">${m.cap}</span></div>`}).join("");
+  return `<div class="row">
+    <div class="mats">${mats}<span class="plus">+</span>${coins(it.v+MAIL)}</div>
+    <span class="op">=</span>
+    <div class="item"><span class="slot big">${it.img ? `<img src="${it.img}" alt="" style="width:100%;height:100%;display:block;border-radius:4px">` : bag(it.c,it.e)}${it.out?`<span class="x2">${it.out}</span>`:""}</span>
+      <div style="min-width:0"><div class="name">${it.name}</div><div class="note">${slotsNote(it.note)}</div><div class="code"><span class="codelbl">Код:</span> ${it.code}</div></div></div>
+  </div>`;
+};
+
+document.getElementById("nick").textContent = NICK;
+document.getElementById("sections").innerHTML = SECTIONS.map(s=>`
+  <section><h2>${s.title}</h2><div class="rows">${s.items.map(row).join("")}</div></section>`).join("");
+</script>
+
+</body></html>
