@@ -317,7 +317,7 @@ $("pickList").addEventListener("change", e => setQty(e.target.closest(".pick").d
 // ---- Ціни аукціону (prices.json робить tools/update_prices.py) ----
 const MARKUP = 1.10;       // запас на зміну цін, поки я купую
 const MIN_DAYS = 3;        // мінімум днів даних у вікні, інакше ціна ненадійна
-const STALE_DAYS = 7;      // старіша за стільки днів ціна ігнорується
+const STALE_DAYS = 30;     // TEMP (beta закрита): було 7. Старіша за стільки днів ціна ігнорується
 const MAX_UNIT = 500000;   // дорожче за 50г за штуку — лишається натурою (мідь)
 let PRICES = null;
 fetch("prices.json", {cache:"no-store"}).then(r => r.ok ? r.json() : null).then(j => { PRICES = j; }).catch(() => {});
