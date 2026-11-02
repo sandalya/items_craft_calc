@@ -132,12 +132,12 @@ const MAT = {
   ruggedL: {id:8170, cap:"Rugged Leather",kind:"leather",c:"#6b4426"},
   enchL:   {id:12810, cap:"Enchanted Leather",kind:"leather",c:"#9b6fd1"},
   coreL:   {id:17012, cap:"Core Leather",  kind:"leather",c:"#d0482c"},
-  pLeather:{cap:"Pristine Leather",kind:"leather",c:"#e6c9a2"},
-  pHide:   {cap:"Pristine Hide", kind:"leather",c:"#c9b79a"},
-  pScale:  {cap:"Pristine Scale",kind:"scale",  c:"#5aa6a0"},
-  cerulean:{cap:"Cerulean Dye",  kind:"vial",   c:"#2f8fe0"},
-  magenta: {cap:"Magenta Dye",   kind:"vial",   c:"#d63c9e"},
-  viridian:{cap:"Viridian Dye",  kind:"vial",   c:"#2fb37a"},
+  pLeather:{id:249427, cap:"Pristine Leather",kind:"leather",c:"#e6c9a2"},
+  pHide:   {id:249428, cap:"Pristine Hide", kind:"leather",c:"#c9b79a"},
+  pScale:  {id:249429, cap:"Pristine Scale",kind:"scale",  c:"#5aa6a0"},
+  cerulean:{id:249409, cap:"Cerulean Dye",  kind:"vial",   c:"#2f8fe0"},
+  magenta: {id:249430, cap:"Magenta Dye",   kind:"vial",   c:"#d63c9e"},
+  viridian:{id:249431, cap:"Viridian Dye",  kind:"vial",   c:"#2fb37a"},
   ichor:   {id:7972, cap:"Ichor of Undeath",kind:"vial", c:"#9fd13a"},
   vision:  {id:11137, cap:"Vision Dust",   kind:"dust",   c:"#e8d24a"},
   gee:     {id:16203, cap:"Greater Eternal Essence",kind:"crystal",c:"#f2c94c"},
@@ -147,8 +147,8 @@ const MAT = {
   ironweb: {id:14227, cap:"Ironweb Spider Silk",kind:"spool",c:"#c8ccd2"},
   pLotus:  {id:8831, cap:"Purple Lotus",  kind:"herb",   c:"#a05ad0"},
   bLotus:  {id:13468, cap:"Black Lotus",   kind:"herb",   c:"#3a2a4a"},
-  morrow:  {cap:"Morrowgrain",   kind:"herb",   c:"#d9b84a"},
-  blood:   {cap:"Bloodvine",     kind:"herb",   c:"#c0242a"},
+  morrow:  {id:11040, cap:"Morrowgrain",   kind:"herb",   c:"#d9b84a"},
+  blood:   {id:19726, cap:"Bloodvine",     kind:"herb",   c:"#c0242a"},
 };
 // Вендор (мідь): нитки і фарби купую я
 const V = {coarse:10, fine:100, silken:500, hSilken:2000, runeT:5000, red:50, green:100, black:1000};
@@ -187,7 +187,7 @@ const SECTIONS = [
   {name:"Satchel of Cenarius",       note:"Сумка для трав на 32 слоти", c:"#2f7a3a", e:"leaf", mats:{rune:30, moon:2, bLotus:1, ironweb:4}, v:0},
   {name:"Soul Pouch",                note:"Сумка для шардів на 24 слоти",c:"#5a2a6a", e:"soul", mats:{rune:30, ruggedL:4, ichor:2}, v:V.runeT},
   {name:"Felcloth Bag",              note:"Сумка для шардів на 32 слоти",c:"#3a7a3a", e:"soul", mats:{fel:12, enchL:6, darkRune:2, ironweb:4}, v:0},
-  {name:"Felblood Soul Bag",         note:"Сумка для шардів на 30 слотів",c:"#6a1a2a", e:"soul", mats:{fel:8, rune:30}, v:0},
+  {name:"Felblood Soul Bag", id:279271,         note:"Сумка для шардів на 30 слотів",c:"#6a1a2a", e:"soul", mats:{fel:8, rune:30}, v:0},
   {name:"Core Felcloth Bag",         note:"Сумка для шардів на 28 слотів",c:"#b8321a", e:"soul", mats:{fel:20, coreL:16, blood:8, fireE:4, ironweb:4}, v:0},
  ]},
 ];
@@ -247,7 +247,7 @@ const BAG_ID = {  // = Wowhead item ID (https://www.wowhead.com/forever/item=ID)
   "Runecloth Reagent Bag":254079,"Mooncloth Reagent Bag":254133,"Bottomless Reagent Bag":254139,
   "Enchanted Mageweave Pouch":22246,"Enchanted Runecloth Bag":22248,"Big Bag of Enchantment":22249,"Cenarion Herb Bag":22251,
   "Satchel of Cenarius":22252,"Soul Pouch":21340,"Felcloth Bag":21341,"Core Felcloth Bag":21342};
-SECTIONS.forEach(s => s.items.forEach(it => { it.code = "TA" + String(++_n).padStart(2,"0"); it.id = BAG_ID[it.name]; if(it.id) it.img = `icons/bag_${it.id}.jpg`; }));
+SECTIONS.forEach(s => s.items.forEach(it => { it.code = "TA" + String(++_n).padStart(2,"0"); if(BAG_ID[it.name]){ it.id = BAG_ID[it.name]; it.img = `icons/bag_${it.id}.jpg`; } }));
 const slotsNote = t => t.replace(/(\d+)\s+(слот\S*)/, '<b class="sl">$1 $2</b>');
 
 const coinSvg = f => `<svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="12" fill="${f}" stroke="#000" stroke-width="2"/><circle cx="15" cy="15" r="7" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="2"/><circle cx="11" cy="11" r="3" fill="#fff" opacity=".35"/></svg>`;
