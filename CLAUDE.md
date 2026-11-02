@@ -1,7 +1,7 @@
 # items_craft_calc — tailoring calculator (WoW Forever)
 
 Public static site (GitHub Pages: https://sandalya.github.io/items_craft_calc/). Everything runs client-side; no backend, no secrets.
-Sibling private repo with the addon: `C:\Users\gamai\giftLedger` (do not copy its docs here).
+Sibling private repo with the addon: `..\giftLedger` (do not copy its docs here).
 
 - `index.html` — single page, data at the top of its script (`MAT`, `V`, `SECTIONS`, `BAG_ID`, `NICK`), icons in `icons/`.
 - Layout: two top tabs **Замовлення / Рецепти**, and under them a profession switch **Tailoring / Enchanting** (shared between the top tabs). Four views (the enchanting order list shows only icon, name, effect and counter; materials appear in the result and on Рецепти): order-tailoring, order-enchanting, recipes-tailoring, recipes-enchanting.
@@ -22,3 +22,4 @@ Sibling private repo with the addon: `C:\Users\gamai\giftLedger` (do not copy it
 - Enchant reagents were added to `MAT` (62 keys), so `update_prices.py` prices them automatically. An enchant shows a gold cost only if ALL its reagents have a price. "Тільки голда" mode works like tailoring.
 - **"Known recipes":** the page reads optional `known.json` = `{"ench":["EN01",...]}`. No file = all enchants shown. Planned: the addon exports known recipes, the price script writes `known.json`. No manual edit mode (removed on purpose).
 - The enchant markup multiplier lives outside the site (not public).
+- **TODO (after the in-game flow is verified):** enchant codes (`EN..`) are sent by **whisper to the crafter**, not by mail (tailoring stays in the mail subject). The enchanting result screen should say so (a banner like the tailoring one, with the whisper wording). Do not build it before the flow works in game.
